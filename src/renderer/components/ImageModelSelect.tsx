@@ -1,6 +1,6 @@
 import { Combobox, type ComboboxProps, Flex, Text, useCombobox } from '@mantine/core'
 import type { ModelProvider } from '@shared/types'
-import { IconServer } from '@tabler/icons-react'
+import { IconPlus, IconServer } from '@tabler/icons-react'
 import { forwardRef, type PropsWithChildren } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ImageModelGroup } from '@/hooks/useImageModelGroups'
@@ -26,11 +26,12 @@ export type ImageModelSelectProps = PropsWithChildren<
   {
     modelGroups: ImageModelGroup[]
     onSelect?: (provider: ModelProvider, model: string) => void
+    onAddCustomModel?: () => void
   } & ComboboxProps
 >
 
 export const ImageModelSelect = forwardRef<HTMLButtonElement, ImageModelSelectProps>(
-  ({ modelGroups, onSelect, children, ...comboboxProps }, ref) => {
+  ({ modelGroups, onSelect, onAddCustomModel, children, ...comboboxProps }, ref) => {
     const { t } = useTranslation()
 
     const combobox = useCombobox({
@@ -84,6 +85,21 @@ export const ImageModelSelect = forwardRef<HTMLButtonElement, ImageModelSelectPr
               ))
             )}
           </Combobox.Options>
+          {onAddCustomModel && (
+            <Combobox.Footer className="!p-1 !border-t !border-[var(--chatbox-border-primary)]">
+              <button
+                type="button"
+                className="flex w-full items-center gap-2 rounded-lg border-0 bg-transparent px-3 py-2 text-left text-sm text-[var(--chatbox-tint-brand)] hover:bg-[var(--chatbox-background-brand-secondary)]"
+                onClick={() => {
+                  combobox.closeDropdown()
+                  onAddCustomModel()
+                }}
+              >
+                <IconPlus size={16} />
+                {t('Add custom image model')}
+              </button>
+            </Combobox.Footer>
+          )}
         </Combobox.Dropdown>
       </Combobox>
     )

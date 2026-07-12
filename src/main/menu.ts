@@ -63,17 +63,17 @@ export default class MenuBuilder {
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
-      label: 'Chatbox',
+      label: 'SakuraBox',
       submenu: [
         {
-          label: 'About Chatbox',
+          label: 'About SakuraBox',
           selector: 'orderFrontStandardAboutPanel:',
         },
         { type: 'separator' },
         { label: 'Services', submenu: [] },
         { type: 'separator' },
         {
-          label: 'Hide Chatbox',
+          label: 'Hide SakuraBox',
           accelerator: 'Command+H',
           selector: 'hide:',
         },

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { type Config, ModelProviderEnum, type SessionSettings, type Settings, Theme } from './types'
+import { type Config, type SessionSettings, type Settings, Theme } from './types'
 
 export function settings(): Settings {
   return {
@@ -81,11 +81,12 @@ export function settings(): Settings {
     theme: Theme.System,
     language: 'en',
     fontSize: 14,
+    interfaceFont: 'sans',
     spellCheck: true,
 
     defaultPrompt: getDefaultPrompt(),
 
-    allowReportingAndTracking: true,
+    allowReportingAndTracking: false,
 
     hasExpiredLicense: false,
     chatboxAIDesktopPromptDismissed: false,
@@ -164,16 +165,12 @@ export function getDefaultPrompt() {
 
 export function chatSessionSettings(): SessionSettings {
   return {
-    provider: ModelProviderEnum.ChatboxAI,
-    modelId: 'chatboxai-4',
     maxContextMessageCount: Number.MAX_SAFE_INTEGER,
   }
 }
 
 export function pictureSessionSettings(): SessionSettings {
   return {
-    provider: ModelProviderEnum.ChatboxAI,
-    modelId: 'DALL-E-3',
     imageGenerateNum: 1,
     dalleStyle: 'vivid',
   }

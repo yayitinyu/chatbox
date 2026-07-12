@@ -4,33 +4,29 @@
 </p>
 
 <h1 align="center">
-<img src='./doc/statics/icon.png' width='30'>
+<img src='./assets/icon.svg' width='42' alt='SakuraBox logo'>
 <span>
-    Chatbox
-    <span style="font-size:8px; font-weight: normal;">(Community Edition)</span>
+    SakuraBox
 </span>
 </h1>
 <p align="center">
-    <em>Your Ultimate AI Copilot on the Desktop. <br />Chatbox is a desktop client for ChatGPT, Claude and other LLMs, available on Windows, Mac, Linux</em>
+    <em>A cute, focused, and private workspace for conversations with your AI models.<br />Built for Windows, macOS, Linux, Web, iOS, and Android.</em>
 </p>
 
 ## Features
 
-### 🤖 AI Model Support
+### 🤖 Model and Reasoning Support
 -   **Support for Multiple LLM Providers**  
-    :gear: Seamlessly integrate with a variety of cutting-edge language models:
-    -   OpenAI (ChatGPT)
-    -   Azure OpenAI
-    -   Claude
-    -   Google Gemini Pro
-    -   Ollama (enable access to local models like llama2, Mistral, Mixtral, codellama, vicuna, yi, and solar)
-    -   ChatGLM-6B
+    :gear: Connect OpenAI, Azure OpenAI, Anthropic Claude, Google Gemini, DeepSeek, OpenRouter, Ollama, and custom OpenAI-compatible providers.
 
--   **Image Generation with Dall-E-3**  
-    :art: Create the images of your imagination with Dall-E-3.
+-   **Configurable Reasoning Effort**
+    :brain: Select automatic, low, medium, high, or extreme reasoning for compatible OpenAI reasoning models.
 
--   **Enhanced Prompting**  
-    :speech_balloon: Advanced prompting features to refine and focus your queries for better responses.
+-   **Flexible Image Generation**
+    :art: Use built-in or custom image models, attach reference images, and generate model-aware output sizes.
+
+-   **Bring Your Own Credentials**
+    :key: Provider configuration stays under your control without commercial-plan prompts in the normal product flow.
 
 ### 🖥️ User Experience
 -   **Local Data Storage**  
@@ -40,7 +36,10 @@
     :package: Get started quickly with downloadable installation packages. No complex setup necessary!
 
 -   **Ergonomic UI & Dark Theme**  
-    :new_moon: A user-friendly interface with a night mode option for reduced eye strain during extended use.
+    :new_moon: A Sakura-inspired light and dark interface with responsive desktop and mobile layouts.
+
+-   **Selectable Interface Typography**
+    :capital_abcd: Switch between sans-serif and serif reading modes. Code, emoji, and mathematical content use dedicated font stacks.
 
 -   **Keyboard Shortcuts**  
     :keyboard: Stay productive with shortcuts that speed up your workflow.
@@ -50,24 +49,20 @@
 
 ### 📄 Content & Formatting
 -   **Markdown, Latex & Code Highlighting**  
-    :scroll: Generate messages with the full power of Markdown and Latex formatting, coupled with syntax highlighting for various programming languages, enhancing readability and presentation.
+    :scroll: Colorful Markdown rendering includes marker-style bold text, resilient emphasis parsing, LaTeX, and syntax highlighting with Google Sans Code.
 
 -   **Prompt Library & Message Quoting**  
     :books: Save and organize prompts for reuse, and quote messages for context in discussions.
 
-### 👥 Collaboration & Sharing
--   **Team Collaboration**  
-    :busts_in_silhouette: Collaborate with ease and share OpenAI API resources among your team. [Learn More](./team-sharing/README.md)
-
 ### 🌐 Platform Availability
 -   **Cross-Platform Desktop**  
-    :computer: Chatbox is ready for Windows, Mac, and Linux users.
+    :computer: SakuraBox is ready for Windows, macOS, and Linux users.
 
 -   **Web Version**  
     :globe_with_meridians: Use the web application on any device with a browser, anywhere.
 
 -   **Mobile Apps**  
-    :phone: Native iOS and Android applications for on-the-go access.
+    :phone: Capacitor-based iOS and Android support. This branch does not include generated native projects; see [Android build](#android-build) for one-time initialization.
 
 ### 🌍 Localization
 -   **Multilingual Support**  
@@ -82,10 +77,6 @@
     -   Русский (Russian)
     -   Español (Spanish)
 
-### ✨ More Features
--   **And More...**  
-    :sparkles: Constantly enhancing the experience with new features!
-
 ## FAQ
 
 -   [Frequently Asked Questions](./doc/FAQ.md)
@@ -96,8 +87,8 @@
 
 Before you begin, ensure you have the following installed:
 
-- **Node.js** (v20.x – v22.x) - [Download here](https://nodejs.org/)
-- **pnpm** (v10.x or later) - Install via `corepack enable && corepack prepare pnpm@latest --activate`
+- **Node.js** (`>=22.12.0 <25`) - [Download here](https://nodejs.org/)
+- **pnpm** (`>=10.17.0`; the repository pins pnpm 10.33.0)
 - **Git** - [Download here](https://git-scm.com/)
 
 ### Quick Setup
@@ -110,7 +101,8 @@ Before you begin, ensure you have the following installed:
 
 2. **Install dependencies**
    ```bash
-   pnpm install
+   corepack enable
+   pnpm install --frozen-lockfile
    ```
 
 3. **Start development server**
@@ -129,6 +121,70 @@ Before you begin, ensure you have the following installed:
 | `pnpm run build` | Build for production without packaging |
 | `pnpm run lint` | Run Biome to check code quality |
 | `pnpm run test` | Run Vitest test suite |
+| `pnpm run check` | Run the TypeScript type checker |
+
+### Android build
+
+SakuraBox uses Capacitor 7 for Android. The current branch contains the mobile web runtime and build scripts, but it intentionally does not contain a `capacitor.config.*` file or generated `android/` project. Complete the following initialization once before using the Android scripts.
+
+#### Prerequisites
+
+- Android Studio with Android SDK Platform 35 and the Android SDK command-line tools
+- JDK 17 or a compatible JDK bundled with Android Studio
+- An Android emulator or a device with USB debugging enabled
+
+#### One-time native project initialization
+
+1. Create `capacitor.config.json` in the repository root. Choose a permanent reverse-domain application ID before publishing:
+
+   ```json
+   {
+     "appId": "com.example.sakurabox",
+     "appName": "SakuraBox",
+     "webDir": "release/app/dist/renderer"
+   }
+   ```
+
+2. Generate the native Android project and application assets:
+
+   ```bash
+   pnpm exec cap add android
+   pnpm run mobile:assets
+   ```
+
+   Capacitor 7 generates an Android project with `minSdkVersion 23`, `compileSdkVersion 35`, and `targetSdkVersion 35` by default.
+
+#### Build and run
+
+After changing frontend code, rebuild the mobile renderer and synchronize Capacitor plugins:
+
+```bash
+pnpm run mobile:sync:android
+```
+
+Open the synchronized project in Android Studio:
+
+```bash
+pnpm run mobile:android
+```
+
+Or build a debug APK directly from PowerShell:
+
+```powershell
+cd android
+.\gradlew.bat assembleDebug
+```
+
+The debug APK is written to `android/app/build/outputs/apk/debug/app-debug.apk`.
+
+For a release bundle:
+
+```powershell
+cd android
+.\gradlew.bat bundleRelease
+```
+
+The release bundle is written to `android/app/build/outputs/bundle/release/app-release.aab`. Configure signing in Android Studio or a private Gradle signing configuration. Never commit keystores or passwords.
 
 ### Project Structure
 
@@ -140,8 +196,8 @@ chatbox/
 │   ├── preload/            # Electron preload scripts
 │   └── shared/             # Shared utilities
 ├── doc/                    # Documentation and assets
+├── assets/                 # Brand and application icons
 ├── resources/              # App resources and icons
-├── team-sharing/           # Team collaboration features
 └── package.json            # Project configuration
 ```
 
@@ -162,6 +218,9 @@ chatbox/
 
 **Issue**: Changes not reflecting in development
 - **Solution**: Stop the dev server, delete `node_modules/.vite`, and restart
+
+**Issue**: Capacitor reports `android platform has not been added yet`
+- **Solution**: Create `capacitor.config.json` and run `pnpm exec cap add android` once, then rerun `pnpm run mobile:sync:android`.
 
 ## License
 

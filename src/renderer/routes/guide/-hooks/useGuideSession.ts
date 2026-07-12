@@ -213,7 +213,6 @@ Chatbox is an **all-in-one AI chat client** that supports 30+ mainstream models 
 - 🆘 [Help Center](`),
             helpCenterUrl,
             t(`) — FAQs
-- 📮 Contact us: hi@chatboxai.com
 
 💡 Follow Chatbox on [Xiaohongshu](https://www.xiaohongshu.com/user/profile/67b581b6000000000e01d11f) for the latest updates and tips
 
@@ -238,7 +237,6 @@ Chatbox is an **all-in-one AI chat client** that supports 30+ mainstream models 
 - 🆘 [Help Center](`),
             helpCenterUrl,
             t(`) — FAQs
-- 📮 Contact us: hi@chatboxai.com
 
 ---
 

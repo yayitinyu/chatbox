@@ -95,6 +95,7 @@ export function useImageModelGroups(): ImageModelGroup[] {
   const openAIProvider = providers.find((p) => p.id === ModelProviderEnum.OpenAI)
   const geminiProvider = providers.find((p) => p.id === ModelProviderEnum.Gemini)
   const customGeminiProviders = providers.filter((p) => p.isCustom && p.type === ModelProviderType.Gemini)
+  const customOpenAIProviders = providers.filter((p) => p.isCustom && p.type === ModelProviderType.OpenAI)
 
   const openAIImageModels = useProviderImageModels(ModelProviderEnum.OpenAI, !!openAIProvider)
   const geminiImageModels = useProviderImageModels(
@@ -147,6 +148,20 @@ export function useImageModelGroups(): ImageModelGroup[] {
       }
     }
 
+    for (const provider of customOpenAIProviders) {
+      const models = (providerSettingsMap?.[provider.id]?.models || [])
+        .filter((model) => model.type === 'image')
+        .map(manualImageModelToOption)
+      if (models.length > 0) {
+        groups.push({
+          label: provider.name,
+          providerId: provider.id,
+          isCustom: true,
+          models,
+        })
+      }
+    }
+
     if (openAIProvider) {
       const manualModels = (providerSettingsMap?.[openAIProvider.id]?.models || [])
         .filter((model) => model.type === 'image')
@@ -167,6 +182,7 @@ export function useImageModelGroups(): ImageModelGroup[] {
     openAIProvider,
     geminiProvider,
     customGeminiProviders,
+    customOpenAIProviders,
     providerSettingsMap,
     chatboxAIImageModels,
     openAIImageModels,

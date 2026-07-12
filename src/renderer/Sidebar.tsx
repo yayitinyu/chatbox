@@ -4,7 +4,6 @@ import {
   IconCirclePlus,
   IconCode,
   IconDownload,
-  IconHelpCircle,
   IconInfoCircle,
   IconLayoutSidebarLeftCollapse,
   IconMessageChatbot,
@@ -29,7 +28,7 @@ import { navigateToSettings } from './modals/Settings'
 import { trackingEvent } from './packages/event'
 import platform from './platform'
 import { featureFlags } from './utils/feature-flags'
-import icon from './static/icon.png'
+import icon from './static/sakurabox-logo.svg'
 import { settingsStore, useLanguage } from './stores/settingsStore'
 import { taskSessionStore } from './stores/taskSessionStore'
 import { useUIStore } from './stores/uiStore'
@@ -162,7 +161,7 @@ export default function Sidebar() {
             <Flex align="center" gap="sm" onClick={() => navigate({ to: '/about' })} style={{ cursor: 'pointer' }}>
               <Image src={icon} w={20} h={20} />
               <Text span c="chatbox-secondary" size="xl" lh={1.2} fw="700">
-                Chatbox
+                SakuraBox
               </Text>
               {/\d/.test(versionHook.version) && (
                 <Text span c="chatbox-tertiary" size="sm">
@@ -265,19 +264,6 @@ export default function Sidebar() {
                 p="xs"
               />
 
-              {!versionHook.isExceeded && (
-                <ActionIcon
-                  variant="transparent"
-                  color="chatbox-secondary"
-                  size={24}
-                  onClick={() => {
-                    navigate({ to: '/guide' })
-                    setShowSidebar(false)
-                  }}
-                >
-                  <ScalableIcon icon={IconHelpCircle} size={20} />
-                </ActionIcon>
-              )}
               <ActionIcon
                 variant="transparent"
                 color="chatbox-secondary"
@@ -319,17 +305,6 @@ export default function Sidebar() {
                 variant="light"
                 p="xs"
               />
-              {!versionHook.isExceeded && (
-                <NavLink
-                  c="chatbox-secondary"
-                  className="rounded"
-                  label={t('Help')}
-                  leftSection={<ScalableIcon icon={IconHelpCircle} size={20} />}
-                  onClick={() => navigate({ to: '/guide' })}
-                  variant="light"
-                  p="xs"
-                />
-              )}
               {FORCE_ENABLE_DEV_PAGES && (
                 <NavLink
                   c="chatbox-secondary"

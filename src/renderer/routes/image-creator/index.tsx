@@ -1,4 +1,3 @@
-import NiceModal from '@ebay/nice-modal-react'
 import {
   ActionIcon,
   Box,
@@ -34,6 +33,7 @@ import { type ImageModelGroup, useImageModelGroups } from '@/hooks/useImageModel
 import { useProviders } from '@/hooks/useProviders'
 import { useIsSmallScreen } from '@/hooks/useScreenChange'
 import { getLogger } from '@/lib/utils'
+import { navigateToSettings } from '@/modals/Settings'
 import storage from '@/storage'
 import { StorageKeyGenerator } from '@/storage/StoreStorage'
 import { useAuthInfoStore } from '@/stores/authInfoStore'
@@ -87,6 +87,7 @@ interface InputToolbarProps {
   onRatioSelect: (ratio: string) => void
   onModelSelect: (provider: string, model: string) => void
   onAddReference: () => void
+  onAddCustomModel: () => void
   onNewCreation: () => void
 }
 
@@ -101,6 +102,7 @@ function InputToolbar({
   onRatioSelect,
   onModelSelect,
   onAddReference,
+  onAddCustomModel,
   onNewCreation,
 }: InputToolbarProps) {
   const { t } = useTranslation()
@@ -122,7 +124,7 @@ function InputToolbar({
             <IconChevronRight size={14} className="text-[var(--chatbox-tint-tertiary)] rotate-90" />
           </UnstyledButton>
         ) : (
-          <ImageModelSelect modelGroups={modelGroups} onSelect={onModelSelect}>
+          <ImageModelSelect modelGroups={modelGroups} onSelect={onModelSelect} onAddCustomModel={onAddCustomModel}>
             <UnstyledButton className="flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-[var(--chatbox-background-tertiary)] transition-colors">
               <IconSparkles size={16} className="text-[var(--chatbox-tint-secondary)]" />
               <Text size="sm" className="text-[var(--chatbox-tint-secondary)] max-w-[120px] truncate">
@@ -230,7 +232,7 @@ function ImageCreatorPage() {
   const tempUploadKeysRef = useRef<Set<string>>(new Set())
   const [showHistory, setShowHistory] = useState(true)
   const [showMobileHistory, setShowMobileHistory] = useState(false)
-  const [selectedProvider, setSelectedProvider] = useState<string>(ModelProviderEnum.ChatboxAI)
+  const [selectedProvider, setSelectedProvider] = useState<string>('')
   const [selectedModel, setSelectedModel] = useState<string>('')
   const [selectedRatio, setSelectedRatio] = useState<string>('auto')
   const [showModelDrawer, setShowModelDrawer] = useState(false)
@@ -429,20 +431,6 @@ function ImageCreatorPage() {
     })
   }, [])
 
-  const handleReportGeneratedImage = useCallback(async (record: ImageGeneration) => {
-    const contentId = [
-      `Image generation prompt: ${record.prompt}`,
-      `Record ID: ${record.id}`,
-      record.taskId ? `Task ID: ${record.taskId}` : undefined,
-      record.generatedImages.length > 0 ? `Images: ${record.generatedImages.join(', ')}` : undefined,
-      `Model: ${record.model.provider}/${record.model.modelId}`,
-    ]
-      .filter((item): item is string => Boolean(item))
-      .join('\n')
-
-    await NiceModal.show('report-content', { contentId })
-  }, [])
-
   const handleHistoryClick = useCallback(
     async (record: ImageGeneration) => {
       await cleanupTempUploads()
@@ -564,7 +552,6 @@ function ImageCreatorPage() {
                       <GeneratedImagesGallery
                         images={currentRecord.generatedImages}
                         onUseAsReference={(urlOrKey) => handleUseAsReference(urlOrKey, currentRecord.id)}
-                        onReport={isSmallScreen ? () => void handleReportGeneratedImage(currentRecord) : undefined}
                       />
                     </Flex>
                   )}
@@ -685,6 +672,7 @@ function ImageCreatorPage() {
                     onRatioSelect={setSelectedRatio}
                     onModelSelect={handleModelSelect}
                     onAddReference={() => fileInputRef.current?.click()}
+                    onAddCustomModel={() => navigateToSettings('provider')}
                     onNewCreation={handleNewCreation}
                   />
                 </Stack>
@@ -741,6 +729,7 @@ function ImageCreatorPage() {
               selectedProvider={selectedProvider}
               selectedModel={selectedModel}
               onSelect={handleModelSelect}
+              onAddCustomModel={() => navigateToSettings('provider')}
             />
 
             <MobileRatioDrawer

@@ -1,8 +1,7 @@
-import { type RemoteConfig, Theme } from '@shared/types'
+import { Theme } from '@shared/types'
 import { z } from 'zod'
 import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 import Toasts from '@/components/common/Toasts'
-import DesktopDownloadReminder from '@/components/layout/DesktopDownloadReminder'
 import ExitFullscreenButton from '@/components/layout/ExitFullscreenButton'
 import useAppTheme from '@/hooks/useAppTheme'
 import { useSystemLanguageWhenInit } from '@/hooks/useDefaultSystemLanguage'
@@ -10,7 +9,6 @@ import { useI18nEffect } from '@/hooks/useI18nEffect'
 import useNeedRoomForWinControls from '@/hooks/useNeedRoomForWinControls'
 import { useSidebarWidth } from '@/hooks/useScreenChange'
 import useShortcut from '@/hooks/useShortcut'
-import useVersion from '@/hooks/useVersion'
 import '@/modals'
 import NiceModal from '@ebay/nice-modal-react'
 import {
@@ -45,15 +43,13 @@ import { ThemeProvider } from '@mui/material/styles'
 import { useQuery } from '@tanstack/react-query'
 import { createRootRoute, Outlet, useLocation } from '@tanstack/react-router'
 import { useAtomValue, useSetAtom } from 'jotai'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo } from 'react'
 import { trackJkViewEvent } from '@/analytics/jk'
 import { JK_EVENTS, JK_PAGE_NAMES } from '@/analytics/jk-events'
 import SettingsModal, { navigateToSettings } from '@/modals/Settings'
 import { prefetchModelRegistry } from '@/packages/model-registry'
 import { getOS } from '@/packages/navigator'
-import * as remote from '@/packages/remote'
 import PictureDialog from '@/pages/PictureDialog'
-import RemoteDialogWindow from '@/pages/RemoteDialogWindow'
 import SearchDialog from '@/pages/SearchDialog'
 import platform from '@/platform'
 import { router } from '@/router'
@@ -61,13 +57,9 @@ import Sidebar from '@/Sidebar'
 import storage from '@/storage'
 import * as atoms from '@/stores/atoms'
 import { getSession, useSession } from '@/stores/chatStore'
-import { initOnboardingStore, onboardingStore } from '@/stores/onboardingStore'
-import * as premiumActions from '@/stores/premiumActions'
-import * as settingActions from '@/stores/settingActions'
 import { initSettingsStore, settingsStore, useLanguage, useSettingsStore, useTheme } from '@/stores/settingsStore'
 import { getTaskSession } from '@/stores/taskSessionStore'
 import { useUIStore } from '@/stores/uiStore'
-import { CHATBOX_BUILD_CHANNEL, CHATBOX_BUILD_PLATFORM } from '@/variables'
 import { blobToDataUrl } from './image-creator/-components/constants'
 
 function BackgroundImageOverlay() {
@@ -135,70 +127,17 @@ function BackgroundImageOverlay() {
 }
 
 function Root() {
-  const { isExceeded, isExceededResolved } = useVersion()
   const location = useLocation()
   const spellCheck = useSettingsStore((state) => state.spellCheck)
   const language = useLanguage()
-  const initialized = useRef(false)
-
-  const setOpenAboutDialog = useUIStore((s) => s.setOpenAboutDialog)
 
   const setRemoteConfig = useSetAtom(atoms.remoteConfigAtom)
 
   useEffect(() => {
-    if (initialized.current) {
-      return
-    }
-    // biome-ignore lint/nursery/noFloatingPromises: inline call
-    ;(async () => {
-      // Wait for stores to hydrate from persistent storage
-      await Promise.all([initSettingsStore(), initOnboardingStore()])
-      void prefetchModelRegistry()
-
-      const remoteConfig = await remote
-        .getRemoteConfig('setting_chatboxai_first')
-        .catch(() => ({ setting_chatboxai_first: false }) as RemoteConfig)
-      setRemoteConfig(async (prev) => ({ ...(await prev), ...remoteConfig }))
-
-      // Skip guide-related checks if already on guide or settings/mcp page
-      if (location.pathname === '/guide' || location.pathname === '/settings/mcp') {
-        initialized.current = true
-        return
-      }
-
-      // On store builds (iOS / Google Play), wait for both version AND remoteConfig.current_version
-      // before making guide/navigation decisions. isExceeded depends on both async data sources;
-      // if we only wait for version, remoteConfig may still be empty, causing isExceeded to be
-      // falsely falsy and letting the guide navigation slip through during store review.
-      const isStoreReviewPlatform =
-        CHATBOX_BUILD_PLATFORM === 'ios' ||
-        (CHATBOX_BUILD_PLATFORM === 'android' && CHATBOX_BUILD_CHANNEL === 'google_play')
-      if (isStoreReviewPlatform && !isExceededResolved) {
-        return
-      }
-
-      initialized.current = true
-
-      // Check if user needs onboarding guide
-      // Conditions: not completed onboarding AND no valid config
-      const onboardingCompleted = onboardingStore.getState().completed
-      const needsSetup = settingActions.needEditSetting()
-
-      // Auto-navigate to guide for new users who need setup
-      if (!isExceeded && !onboardingCompleted && needsSetup) {
-        router.navigate({ to: '/guide', replace: true })
-        return
-      }
-
-      // 是否需要弹出关于窗口（更新后首次启动）
-      // 目前仅在桌面版本更新后首次启动、且网络环境为"外网"的情况下才自动弹窗
-      const shouldShowAboutDialogWhenStartUp = await platform.shouldShowAboutDialogWhenStartUp()
-      if (shouldShowAboutDialogWhenStartUp && remoteConfig.setting_chatboxai_first) {
-        setOpenAboutDialog(true)
-        return
-      }
-    })()
-  }, [setOpenAboutDialog, setRemoteConfig, location.pathname, isExceeded, isExceededResolved])
+    void initSettingsStore()
+    void prefetchModelRegistry()
+    setRemoteConfig({ setting_chatboxai_first: false })
+  }, [setRemoteConfig])
 
   const showSidebar = useUIStore((s) => s.showSidebar)
   const sidebarWidth = useSidebarWidth()
@@ -359,13 +298,8 @@ function Root() {
       {/* <OpenAttachLinkDialog /> */}
       {/* 图片预览 */}
       <PictureDialog />
-      {/* 似乎是从后端拉一个弹窗的配置 */}
-      <RemoteDialogWindow />
-      {/* 手机端举报内容 */}
-      {/* <ReportContentDialog /> */}
       {/* 搜索 */}
       <SearchDialog />
-      <DesktopDownloadReminder />
       {/* 没有配置模型时的欢迎弹窗 */}
       {/* <WelcomeDialog /> */}
       <Toasts /> {/* mui */}
@@ -378,6 +312,8 @@ const creteMantineTheme = (scale = 1) =>
   createTheme({
     /** Put your mantine theme override here */
     scale,
+    fontFamily: 'var(--font-interface)',
+    fontFamilyMonospace: 'var(--font-code)',
     primaryColor: 'chatbox-brand',
     colors: {
       'chatbox-brand': colorsTuple(Array.from({ length: 10 }, () => 'var(--chatbox-tint-brand)')),
@@ -645,7 +581,6 @@ export const Route = createRootRoute({
   }),
   component: () => {
     useI18nEffect()
-    premiumActions.useAutoValidate() // 每次启动都执行 license 检查，防止用户在lemonsqueezy管理页面中取消了当前设备的激活
     useSystemLanguageWhenInit()
     useShortcut()
     const theme = useAppTheme()

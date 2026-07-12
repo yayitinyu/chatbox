@@ -29,6 +29,7 @@ import type {
   StreamTextResult,
 } from '../types'
 import type { ModelDependencies } from '../types/adapters'
+import { resolveOpenAIImageSize } from '../utils/image_generation'
 import { ApiError, ChatboxAIAPIError } from './errors'
 import type {
   CallChatCompletionOptions,
@@ -351,11 +352,22 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
     if (!imageModel) {
       throw new ApiError('Provider doesnt support image generation')
     }
+    const imageModelId =
+      typeof (imageModel as { modelId?: unknown }).modelId === 'string'
+        ? (imageModel as { modelId: string }).modelId
+        : ''
+    const prompt =
+      params.images && params.images.length > 0
+        ? {
+            text: params.prompt,
+            images: params.images.map((image) => image.imageUrl),
+          }
+        : params.prompt
     const result = await generateImage({
       model: imageModel,
-      prompt: params.prompt,
-      // images 暂时不支持
+      prompt,
       n: params.num,
+      size: resolveOpenAIImageSize(imageModelId, params.aspectRatio),
       abortSignal: signal,
       // Image generation is billable; network-error retries could double-charge.
       maxRetries: 0,

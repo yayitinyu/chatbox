@@ -1,29 +1,117 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="height=device-height, width=device-width, initial-scale=1, user-scalable=no" />
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="height=device-height, width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover"
+    />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-title" content="chatbox" />
-    <meta name="theme-color" content="#000000" />
-    <meta name="description" content="chatbox" />
-    <title>Chatbox网页版</title>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-B365F44W6E"></script>
+    <meta name="apple-mobile-web-app-title" content="SakuraBox" />
+    <meta name="theme-color" content="#c73f6c" />
+    <meta name="description" content="SakuraBox, a friendly desktop client for your AI models." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght,MONO@0,300..800,1;1,300..800,1&family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Lora:ital,wght@0,400..700;1,400..700&family=Noto+Color+Emoji&family=Noto+Serif+SC:wght@200..900&family=STIX+Two+Math&display=swap"
+      rel="stylesheet"
+    />
+    <title>SakuraBox</title>
     <script>
-      window.dataLayer = window.dataLayer || []
-      function gtag() {
-        dataLayer.push(arguments)
+      var initialTheme = localStorage.getItem("initial-theme");
+      if (initialTheme === "light" || initialTheme === "dark") {
+        document.documentElement.setAttribute("data-theme", initialTheme);
+        document.documentElement.setAttribute("data-mantine-color-scheme", initialTheme);
       }
-      gtag('js', new Date())
     </script>
-    <script defer data-domain="web.chatboxai.app" src="https://plausible.midway.run/js/script.js"></script>
+    <style>
+      :root {
+        color-scheme: light dark;
+        background: #fffafb;
+      }
+      html[data-theme="dark"] {
+        background: #1d191c;
+      }
+      body {
+        margin: 0;
+      }
+      .splash-screen {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: grid;
+        place-items: center;
+        background:
+          radial-gradient(circle at 50% 44%, rgba(241, 115, 155, 0.12), transparent 34%),
+          #fffafb;
+        color: #30242a;
+      }
+      html[data-theme="dark"] .splash-screen {
+        background:
+          radial-gradient(circle at 50% 44%, rgba(255, 133, 170, 0.12), transparent 34%),
+          #1d191c;
+        color: #f8eef2;
+      }
+      .splash-screen-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      .splash-screen-logo {
+        width: 82px;
+        height: 82px;
+        filter: drop-shadow(0 14px 28px rgba(143, 41, 79, 0.18));
+      }
+      .splash-screen-wordmark {
+        margin: 0;
+        font: 700 22px/1.2 "Google Sans", system-ui, sans-serif;
+        letter-spacing: -0.02em;
+      }
+      .splash-screen-status {
+        min-height: 20px;
+        color: #927b85;
+        font: 400 12px/1.5 "Google Sans", system-ui, sans-serif;
+      }
+      .splash-screen-fade-out {
+        animation: splash-fade-out 0.28s ease-out forwards;
+      }
+      @keyframes splash-fade-out {
+        to {
+          opacity: 0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .splash-screen-fade-out {
+          animation-duration: 0.01ms;
+        }
+      }
+    </style>
   </head>
   <body>
-    <div id="root">
-      <div style="height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center">
-        <h1 style="font-family: 'Roboto', sans-serif; font-weight: 700; color: #333; margin: 0">Chatbox</h1>
-        <p style="font-family: 'Roboto', sans-serif; font-weight: 400; color: #333; opacity: 0.4">loading...</p>
+    <div id="root"></div>
+    <div class="splash-screen">
+      <div class="splash-screen-content">
+        <svg class="splash-screen-logo" viewBox="0 0 96 96" fill="none" aria-label="SakuraBox">
+          <defs>
+            <linearGradient id="sakura-surface" x1="17" y1="10" x2="80" y2="77" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#F1739B" />
+              <stop offset="1" stop-color="#C83D6B" />
+            </linearGradient>
+          </defs>
+          <path d="M21 11H75C82.732 11 89 17.268 89 25V57C89 64.732 82.732 71 75 71H45L27 85V71H21C13.268 71 7 64.732 7 57V25C7 17.268 13.268 11 21 11Z" fill="url(#sakura-surface)" />
+          <g fill="#FFF9FB">
+            <ellipse cx="48" cy="31" rx="6.6" ry="12" />
+            <ellipse cx="48" cy="31" rx="6.6" ry="12" transform="rotate(72 48 43)" />
+            <ellipse cx="48" cy="31" rx="6.6" ry="12" transform="rotate(144 48 43)" />
+            <ellipse cx="48" cy="31" rx="6.6" ry="12" transform="rotate(216 48 43)" />
+            <ellipse cx="48" cy="31" rx="6.6" ry="12" transform="rotate(288 48 43)" />
+          </g>
+          <circle cx="48" cy="43" r="5.5" fill="#FFD4E1" />
+          <path d="M72 22L73.4 25.6L77 27L73.4 28.4L72 32L70.6 28.4L67 27L70.6 25.6L72 22Z" fill="#FFF9FB" />
+        </svg>
+        <p class="splash-screen-wordmark">SakuraBox</p>
+        <div class="splash-screen-status" id="log-root"></div>
       </div>
     </div>
   </body>

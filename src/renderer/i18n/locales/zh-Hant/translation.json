@@ -980,5 +980,20 @@
   "Your license has expired.": "您的許可證已過期。",
   "Your license has expired. Please check your subscription or purchase a new one.": "您的授權已過期。請檢查您的訂閱方案或購買新的授權。",
   "Your license has expired. You can continue using your expansion pack.": "您的授權已過期。您可以繼續使用您的擴充包。",
-  "Your rating on the App Store would help make Chatbox even better!": "您的 App Store 評分將幫助 Chatbox 變得更好！"
+  "Your rating on the App Store would help make Chatbox even better!": "您的 App Store 評分將幫助 Chatbox 變得更好！",
+  "Add custom image model": "新增自訂生圖模型",
+  "API Keys": "API 金鑰",
+  "Available levels depend on the selected OpenAI reasoning model. Extreme is sent as xhigh.": "可用強度取決於所選 OpenAI 推理模型；極高會以 xhigh 參數傳送。",
+  "Connect Provider": "連接模型渠道",
+  "Connect a model provider to start a private conversation.": "連接一個模型渠道即可開始私密對話。",
+  "Extreme": "極高",
+  "Interface Font": "介面字體",
+  "Sans Serif": "無襯線體",
+  "Serif": "襯線體",
+  "Uses Google Sans with system sans-serif fallbacks for a clean interface.": "使用 Google Sans 與系統無襯線後備字體，介面更清晰。",
+  "Uses Lora and Noto Serif SC for a more editorial reading experience.": "使用 Lora 與 Noto Serif SC，獲得更舒適的長文閱讀體驗。",
+  "Connection to {{aiProvider}} failed. This usually means the provider configuration or account needs attention. Please <buttonOpenSettings>check your settings</buttonOpenSettings> and try again.": "連接 {{aiProvider}} 失敗，通常是渠道配置或帳戶狀態需要處理。請<buttonOpenSettings>檢查設定</buttonOpenSettings>後重試。",
+  "An error occurred while processing your request. Please check your provider settings and try again.": "處理請求時發生錯誤。請檢查模型渠道設定後重試。",
+  "An unknown error occurred. Check the provider settings and try again.": "發生未知錯誤。請檢查模型渠道設定後重試。",
+  "Welcome to SakuraBox": "歡迎使用 SakuraBox"
 }

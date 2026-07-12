@@ -58,6 +58,7 @@ import {
 import clsx from 'clsx'
 import { visit } from 'unist-util-visit'
 import { useCopied } from '@/hooks/useCopied'
+import { normalizeMarkdownEmphasis } from '@/utils/markdown'
 import { deployHtmlToEdgeOne } from '../packages/edgeone'
 import { highlight, highlightSync, type ShikiTheme } from '../packages/shiki'
 import * as toastActions from '../stores/toastActions'
@@ -108,6 +109,11 @@ function Markdown(props: {
 
   const codeFences = useMemo(() => (children.match(/```/g) || []).length, [children])
   const generatingCodeIndex = useMemo(() => (codeFences % 2 === 0 ? -1 : Math.floor(codeFences / 2)), [codeFences])
+  const normalizedMarkdown = useMemo(() => normalizeMarkdownEmphasis(children), [children])
+  const renderedMarkdown = useMemo(
+    () => (enableLaTeXRendering ? latex.processLaTeX(normalizedMarkdown) : normalizedMarkdown),
+    [enableLaTeXRendering, normalizedMarkdown]
+  )
 
   return (
     <ReactMarkdown
@@ -117,7 +123,7 @@ function Markdown(props: {
           : [remarkGfm, remarkBreaks, remarkAddCodeIndex]
       }
       rehypePlugins={[rehypeKatex]}
-      className={`break-words [overflow-wrap:anywhere] ${className || ''}`}
+      className={`sakura-markdown break-words [overflow-wrap:anywhere] ${className || ''}`}
       // react-markdown's default defaultUrlTransform will incorrectly encode query parameters in URLs (e.g. & becomes &amp;)
       // Use sanitizeUrl here to avoid that and to prevent XSS attacks
       urlTransform={(url) => sanitizeUrl(url)}
@@ -162,7 +168,7 @@ function Markdown(props: {
         ]
       )}
     >
-      {enableLaTeXRendering ? latex.processLaTeX(children) : children}
+      {renderedMarkdown}
     </ReactMarkdown>
   )
 }

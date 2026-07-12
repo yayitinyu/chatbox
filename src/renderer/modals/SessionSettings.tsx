@@ -615,17 +615,18 @@ function OpenAIProviderConfig({
   // Memoize options to prevent recreation on every render
   const reasoningEffortOptions = useMemo(
     () => [
-      { label: t('Disabled'), value: 'null' },
+      { label: t('Auto'), value: 'auto' },
       { label: t('Low'), value: 'low' },
       { label: t('Medium'), value: 'medium' },
       { label: t('High'), value: 'high' },
+      { label: t('Extreme'), value: 'xhigh' },
     ],
     [t]
   )
 
   const handleReasoningEffortChange = useCallback(
     (value: string) => {
-      const reasoningEffort = value === 'null' ? undefined : (value as 'low' | 'medium' | 'high')
+      const reasoningEffort = value === 'auto' ? undefined : (value as 'low' | 'medium' | 'high' | 'xhigh')
       onSettingsChange({
         providerOptions: {
           openai: { reasoningEffort },
@@ -638,7 +639,7 @@ function OpenAIProviderConfig({
   // Simplify value calculation to avoid instability
   const currentValue = useMemo(() => {
     const effort = providerOptions?.reasoningEffort
-    return effort === undefined ? 'null' : effort
+    return effort === undefined ? 'auto' : effort
   }, [providerOptions?.reasoningEffort])
 
   return (
@@ -648,7 +649,7 @@ function OpenAIProviderConfig({
           {t('Thinking Effort')}
         </Text>
         <Tooltip
-          label={t('Thinking Effort only works for OpenAI o-series models')}
+          label={t('Available levels depend on the selected OpenAI reasoning model. Extreme is sent as xhigh.')}
           withArrow={true}
           maw={320}
           className="!whitespace-normal"

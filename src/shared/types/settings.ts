@@ -115,7 +115,7 @@ const ClaudeParamsSchema = z.object({
 })
 
 const OpenAIParamsSchema = z.object({
-  reasoningEffort: z.enum(['low', 'medium', 'high']).optional().catch(undefined),
+  reasoningEffort: z.enum(['low', 'medium', 'high', 'xhigh']).optional().catch(undefined),
 })
 
 const GoogleParamsSchema = z.object({
@@ -373,6 +373,7 @@ export const SettingsSchema = GlobalSessionSettingsSchema.extend({
   ]),
   languageInited: z.boolean().optional(),
   fontSize: z.number().catch(14),
+  interfaceFont: z.enum(['sans', 'serif']).default('sans'),
   spellCheck: z.boolean().optional(),
 
   startupPage: z.enum(['home', 'session']).optional(),

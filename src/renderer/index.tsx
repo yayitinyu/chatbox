@@ -11,7 +11,6 @@ import { ErrorBoundary } from './components/common/ErrorBoundary'
 import i18n from './i18n'
 import { getLogger } from './lib/utils'
 import platform from './platform'
-import reportWebVitals from './reportWebVitals'
 import { router } from './router'
 import './static/globals.css'
 import './static/index.css'
@@ -26,19 +25,15 @@ const log = getLogger('index')
 import './setup/load_polyfill'
 
 // Sentry 初始化
-import './setup/sentry_init'
 
 // 全局错误处理
 import './setup/global_error_handler'
 
 // GA4 初始化
-import './setup/ga_init'
 
 // Plausible 初始化
-import './setup/plausible_init'
 
 // jk analytics 初始化
-import './setup/jk_analytics_init'
 
 // 引入保护代码
 import './setup/protect'
@@ -46,7 +41,6 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { initSessionAttachmentRagMaintenance } from './setup/session_attachment_rag_maintenance'
 import { initLastUsedModelStore } from './stores/lastUsedModelStore'
 import { initOnboardingStore } from './stores/onboardingStore'
-import { initLoginLicenseStateReconciliation } from './stores/premiumActions'
 import { initRecentDirectoriesStore } from './stores/recentDirectoriesStore'
 import { initSettingsStore } from './stores/settingsStore'
 import { initUpdateListeners } from './stores/updateStore'
@@ -153,7 +147,6 @@ initializeApp()
     ])
 
     i18n.changeLanguage(settings.language)
-    initLoginLicenseStateReconciliation()
 
     // Initialize auto-updater event listeners (desktop only, idempotent)
     if (platform.type === 'desktop') {
@@ -196,4 +189,3 @@ initializeApp()
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals()

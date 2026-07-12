@@ -6,6 +6,7 @@ import {
   FileButton,
   Flex,
   Radio,
+  SegmentedControl,
   Select,
   Stack,
   Switch,
@@ -70,6 +71,24 @@ export function RouteComponent() {
             }
           }}
         />
+
+        <Stack gap="xs" maw={320}>
+          <Text>{t('Interface Font')}</Text>
+          <SegmentedControl
+            fullWidth
+            value={settings.interfaceFont}
+            data={[
+              { value: 'sans', label: t('Sans Serif') },
+              { value: 'serif', label: t('Serif') },
+            ]}
+            onChange={(value) => setSettings({ interfaceFont: value as 'sans' | 'serif' })}
+          />
+          <Text size="xs" c="chatbox-tertiary">
+            {settings.interfaceFont === 'serif'
+              ? t('Uses Lora and Noto Serif SC for a more editorial reading experience.')
+              : t('Uses Google Sans with system sans-serif fallbacks for a clean interface.')}
+          </Text>
+        </Stack>
 
         {/* theme */}
         <AdaptiveSelect
@@ -165,26 +184,6 @@ export function RouteComponent() {
 
       {/* Export Logs */}
       <ExportLogsSection />
-
-      <Divider />
-
-      {/* Error Reporting */}
-      <Stack gap="md">
-        <Stack gap="xxs">
-          <Title order={5}>{t('Error Reporting')}</Title>
-          <Text c="chatbox-tertiary">
-            {t(
-              'Chatbox respects your privacy and only uploads anonymous error data and events when necessary. You can change your preferences at any time in the settings.'
-            )}
-          </Text>
-        </Stack>
-
-        <Checkbox
-          label={t('Enable optional anonymous reporting of crash and event data')}
-          checked={settings.allowReportingAndTracking}
-          onChange={(e) => setSettings({ allowReportingAndTracking: e.target.checked })}
-        />
-      </Stack>
 
       {/* others */}
       {platform.type === 'desktop' && (
@@ -540,7 +539,7 @@ const ImportExportDataSection = () => {
         )}
         {[
           { label: t('Settings'), value: ExportDataItem.Setting },
-          { label: t('API KEY & License'), value: ExportDataItem.Key },
+          { label: t('API Keys'), value: ExportDataItem.Key },
           { label: t('Chat History'), value: ExportDataItem.Conversations },
           { label: t('My Copilots'), value: ExportDataItem.Copilot },
         ].map(({ label, value }) => (

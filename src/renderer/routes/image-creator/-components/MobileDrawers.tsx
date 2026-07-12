@@ -112,6 +112,7 @@ export interface MobileModelDrawerProps {
   selectedProvider: string
   selectedModel: string
   onSelect: (provider: string, model: string) => void
+  onAddCustomModel: () => void
 }
 
 export function MobileModelDrawer({
@@ -121,6 +122,7 @@ export function MobileModelDrawer({
   selectedProvider,
   selectedModel,
   onSelect,
+  onAddCustomModel,
 }: MobileModelDrawerProps) {
   const { t } = useTranslation()
 
@@ -185,6 +187,20 @@ export function MobileModelDrawer({
               ))}
             </Stack>
           </ScrollArea>
+          <Box p="xs" className="border-t border-[var(--chatbox-border-primary)]">
+            <UnstyledButton
+              className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-[var(--chatbox-tint-brand)] hover:bg-[var(--chatbox-background-brand-secondary)]"
+              onClick={() => {
+                onOpenChange(false)
+                onAddCustomModel()
+              }}
+            >
+              <IconPlus size={18} />
+              <Text size="sm" fw={600}>
+                {t('Add custom image model')}
+              </Text>
+            </UnstyledButton>
+          </Box>
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>

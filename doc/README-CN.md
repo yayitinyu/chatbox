@@ -4,14 +4,13 @@
 </p>
 
 <h1 align="center">
-<img src='./statics/icon.png' width='30'>
+<img src='../assets/icon.svg' width='42' alt='SakuraBox Logo'>
 <span>
-    Chatbox
-    <span style="font-size:8px; font-weight: normal;">(Community Edition)</span>
+    SakuraBox
 </span>
 </h1>
 <p align="center">
-    <em>Chatbox 是一个 AI 模型桌面客户端，支持 ChatGPT、Claude、Google Gemini、Ollama 等主流模型，适用于 Windows、Mac、Linux、Web、Android 和 iOS 全平台</em>
+    <em>一个可爱、专注且重视隐私的多模型 AI 聊天工作台，支持 Windows、macOS、Linux、Web、iOS 与 Android。</em>
 </p>
 
 ## 特性
@@ -23,26 +22,19 @@
     :package: 通过可下载的安装包快速开始使用。无需复杂设置！
 
 -   **支持多个 LLM 提供商**  
-    :gear: 无缝集成多种 AI 模型：
+    :gear: 支持 OpenAI、Azure OpenAI、Claude、Google Gemini、DeepSeek、OpenRouter、Ollama 与自定义 OpenAI 兼容渠道。
 
-    -   OpenAI (ChatGPT)
-    -   Azure OpenAI
-    -   Claude
-    -   Google Gemini Pro
-    -   Ollama (启用对本地模型的访问，如 llama2、Mistral、Mixtral、codellama、vicuna、yi 和 solar)
-    -   ChatGLM-6B
+-   **灵活的图片生成**
+    :art: 支持内置或自定义生图模型、参考图输入，以及针对不同模型优化的输出尺寸。
 
--   **使用 Dall-E-3 生成图像**  
-    :art: 使用 Dall-E-3 创建您想象中的图像。
-
--   **增强提示**  
-    :speech_balloon: 高级提示功能，精炼并聚焦您的查询以获得更好的响应。
+-   **可调节思考强度**
+    :brain: 兼容的 OpenAI 推理模型可选择自动、低、中、高或极高思考强度。
 
 -   **键盘快捷键**  
     :keyboard: 使用加速您工作流程的快捷键保持高效。
 
 -   **Markdown、Latex 和代码高亮**  
-    :scroll: 使用 Markdown 和 Latex 的全部功能生成消息，并结合各种编程语言的语法高亮，提高可读性和呈现效果。
+    :scroll: 彩色 Markdown 支持荧光笔式粗体、稳定的强调语法、LaTeX 和使用 Google Sans Code 的代码高亮。
 
 -   **提示库和消息引用**  
     :books: 保存和组织提示以供重复使用，并引用消息以在讨论中提供上下文。
@@ -51,19 +43,16 @@
     :arrow_forward: 通过即时、渐进式回复快速响应您的互动。
 
 -   **人体工程学 UI 和深色主题**  
-    :new_moon: 用户友好的界面，带有夜间模式选项，减少长时间使用时的眼睛疲劳。
-
--   **团队协作**  
-    :busts_in_silhouette: 轻松协作并在团队中共享 OpenAI API 资源。[了解更多](../team-sharing/README.md)
+    :new_moon: 樱花主题的明暗界面，并可切换无衬线与衬线阅读字体。
 
 -   **跨平台可用性**  
-    :computer: 聊天盒已为 Windows、Mac、Linux 用户准备就绪。
+    :computer: 支持 Windows、macOS、Linux 和 Web。
 
 -   **通过 Web 版本随处访问**  
     :globe_with_meridians: 在任何设备上使用带有浏览器的 Web 应用程序，随时随地。
 
 -   **iOS 和 Android**  
-    :phone: 使用移动应用程序，随时随地在您的指尖上带来这种能力。
+    :phone: 使用 Capacitor 构建移动应用；当前分支需要先生成原生 Android 工程，步骤见下文。
 
 -   **多语言支持**  
     :earth_americas: 通过提供多种语言的支持，迎合全球受众：
@@ -77,14 +66,13 @@
     -   Deutsch (German)
     -   Русский (Russian)
 
--   **更多...**  
-    :sparkles: 不断增强体验，加入新功能！
-
 ## 常见问题解答
 
 -   [常见问题](./FAQ-CN.md)
 
-## 构建指南
+## 桌面端开发与构建
+
+环境要求：Node.js `>=22.12.0 <25`、pnpm `>=10.17.0` 和 Git。
 
 1. 从 Github 克隆仓库
 
@@ -92,26 +80,99 @@
 git clone https://github.com/chatboxai/chatbox.git
 ```
 
-2. 安装所需的依赖
+2. 安装依赖
 
 ```bash
-npm install
+corepack enable
+pnpm install --frozen-lockfile
 ```
 
 3. 启动应用程序（开发模式）
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 4. 构建应用程序，为当前平台打包安装程序
 
 ```bash
-npm run package
+pnpm run package
 ```
 
 5. 构建应用程序，为所有平台打包安装程序
 
 ```bash
-npm run package:all
+pnpm run package:all
 ```
+
+提交前建议运行：
+
+```bash
+pnpm run check
+pnpm run test
+pnpm run build
+```
+
+## 构建 Android 应用
+
+SakuraBox 使用 Capacitor 7。当前分支包含移动端 Web 运行时和构建脚本，但没有提交 `capacitor.config.*` 和生成后的 `android/` 原生工程，因此首次构建需要初始化一次。
+
+### 环境要求
+
+- Android Studio
+- Android SDK Platform 35 和 SDK Command-line Tools
+- JDK 17，或 Android Studio 自带的兼容 JDK
+- Android 模拟器，或已开启 USB 调试的真机
+
+### 首次初始化
+
+在仓库根目录创建 `capacitor.config.json`。发布前请将示例包名替换为你确定长期使用的反向域名应用 ID：
+
+```json
+{
+  "appId": "com.example.sakurabox",
+  "appName": "SakuraBox",
+  "webDir": "release/app/dist/renderer"
+}
+```
+
+然后生成 Android 工程和应用图标：
+
+```bash
+pnpm exec cap add android
+pnpm run mobile:assets
+```
+
+Capacitor 7 默认生成的工程使用 `minSdkVersion 23`、`compileSdkVersion 35` 和 `targetSdkVersion 35`。
+
+### 同步与运行
+
+每次修改前端代码后运行：
+
+```bash
+pnpm run mobile:sync:android
+```
+
+同步并在 Android Studio 中打开：
+
+```bash
+pnpm run mobile:android
+```
+
+在 Windows PowerShell 中直接构建 Debug APK：
+
+```powershell
+cd android
+.\gradlew.bat assembleDebug
+```
+
+输出文件：`android/app/build/outputs/apk/debug/app-debug.apk`。
+
+构建用于应用商店的 AAB：
+
+```powershell
+cd android
+.\gradlew.bat bundleRelease
+```
+
+输出文件：`android/app/build/outputs/bundle/release/app-release.aab`。正式发布前请通过 Android Studio 或私有 Gradle 配置完成签名，切勿把 keystore、密码或密钥提交到 Git。

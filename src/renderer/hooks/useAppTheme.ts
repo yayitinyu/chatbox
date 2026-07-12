@@ -26,6 +26,7 @@ export default function useAppTheme() {
   const theme = useSettingsStore((state) => state.theme)
   const realTheme = useUIStore((state) => state.realTheme)
   const language = useLanguage()
+  const interfaceFont = useSettingsStore((state) => state.interfaceFont)
 
   useLayoutEffect(() => {
     switchTheme(theme)
@@ -49,11 +50,22 @@ export default function useAppTheme() {
     }
   }, [realTheme])
 
-  const themeObj = useMemo(() => createTheme(getThemeDesign(realTheme, language)), [realTheme, language])
+  useLayoutEffect(() => {
+    document.documentElement.setAttribute('data-interface-font', interfaceFont)
+  }, [interfaceFont])
+
+  const themeObj = useMemo(
+    () => createTheme(getThemeDesign(realTheme, language, interfaceFont)),
+    [realTheme, language, interfaceFont]
+  )
   return themeObj
 }
 
-export function getThemeDesign(realTheme: 'light' | 'dark', language: Language): ThemeOptions {
+export function getThemeDesign(
+  realTheme: 'light' | 'dark',
+  language: Language,
+  interfaceFont: 'sans' | 'serif' = 'sans'
+): ThemeOptions {
   return {
     palette: {
       mode: realTheme,
@@ -84,7 +96,9 @@ export function getThemeDesign(realTheme: 'light' | 'dark', language: Language):
         ? {
             fontFamily: 'Cairo, Arial, sans-serif',
           }
-        : {}),
+        : {
+            fontFamily: interfaceFont === 'serif' ? 'var(--font-serif)' : 'var(--font-sans)',
+          }),
       fontSize: 14,
     },
     direction: language === 'ar' ? 'rtl' : 'ltr',

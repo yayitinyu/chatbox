@@ -9,6 +9,8 @@
 .shiki-code-wrapper pre.shiki code {
   counter-reset: line;
   background: transparent !important;
+  font-family: var(--font-code);
+  font-variation-settings: "MONO" 1;
 }
 
 .shiki-code-wrapper pre.shiki code .line::before {
