@@ -100,7 +100,7 @@ import { AdaptiveModal } from '../common/AdaptiveModal'
 import { CompressionModal } from '../common/CompressionModal'
 import { ScalableIcon } from '../common/ScalableIcon'
 import Disclaimer from '../Disclaimer'
-import ProviderImageIcon from '../icons/ProviderImageIcon'
+import { ModelIcon } from '../icons/ModelIcon'
 import KnowledgeBaseMenu from '../knowledge-base/KnowledgeBaseMenu'
 import ModelSelector from '../ModelSelector'
 import MCPMenu from '../mcp/MCPMenu'
@@ -117,6 +117,7 @@ import {
   storeLinkPromise,
 } from './preprocessState'
 import TokenCountMenu from './TokenCountMenu'
+import ThinkingEffortMenu from './ThinkingEffortMenu'
 
 export type InputBoxPayload = {
   constructedMessage: Message
@@ -999,7 +1000,7 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
 
       for (const file of files) {
         // 文件和图片插入方法复用，会导致 svg、gif 这类不支持的图片也被插入，但暂时没看到有什么问题
-        if (file.type.startsWith('image/')) {
+        if (file.type.startsWith('image/') && file.type !== 'image/svg+xml') {
           // 超过上限时直接跳过：保留最先添加的前 8 张，且不浪费转码/不产生孤儿 blob
           if (imageCount >= MAX_IMAGES) {
             droppedImages++
@@ -1618,6 +1619,12 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
                   </UnstyledButton>
                 </Tooltip>
 
+                <ThinkingEffortMenu
+                  sessionId={currentSessionId && !isNewSession ? currentSessionId : null}
+                  settings={currentSessionMergedSettings}
+                  iconSize={toolbarIconSize}
+                />
+
                 {!isSmallScreen &&
                   (showRollbackThreadButton ? (
                     <Tooltip label={t('Rollback Thread')} position="top" withArrow>
@@ -1766,16 +1773,27 @@ const InputBox = forwardRef<InputBoxRef, InputBoxProps>(
                           !model && 'animate-pulse bg-blue-500/20'
                         )}
                       >
-                        {!!model && <ProviderImageIcon size={18} provider={model.provider} />}
-                        <Text
-                          size="sm"
-                          className={cn(
-                            'min-w-0 flex-1 truncate text-[var(--chatbox-tint-secondary)]',
-                            isSmallScreen ? 'max-w-[100px]' : 'max-w-[160px]'
-                          )}
-                        >
-                          {modelSelectorDisplayText}
-                        </Text>
+                        {!!model && (
+                          <Tooltip label={modelSelectorDisplayText} withArrow>
+                            <ModelIcon
+                              size={18}
+                              modelId={model.modelId}
+                              providerId={model.provider}
+                              iconUrl={modelInfo?.iconUrl}
+                            />
+                          </Tooltip>
+                        )}
+                        {!model && (
+                          <Text
+                            size="sm"
+                            className={cn(
+                              'min-w-0 flex-1 truncate text-[var(--chatbox-tint-secondary)]',
+                              isSmallScreen ? 'max-w-[100px]' : 'max-w-[160px]'
+                            )}
+                          >
+                            {modelSelectorDisplayText}
+                          </Text>
+                        )}
                         <IconChevronRight
                           size={14}
                           className="text-[var(--chatbox-tint-tertiary)] rotate-90 flex-shrink-0"

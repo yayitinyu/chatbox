@@ -16,6 +16,7 @@ import { capitalize } from 'lodash'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ScalableIcon } from './common/ScalableIcon'
+import { ModelIcon } from './icons/ModelIcon'
 
 interface ModelListProps {
   models: ProviderModelInfo[]
@@ -27,6 +28,7 @@ interface ModelListProps {
   displayedModelIds?: string[]
   showSearch?: boolean
   className?: string
+  providerId?: string
 }
 
 export function ModelList({
@@ -39,6 +41,7 @@ export function ModelList({
   displayedModelIds,
   showSearch = true,
   className,
+  providerId,
 }: ModelListProps) {
   const { t } = useTranslation()
   const [searchQuery, setSearchQuery] = useState('')
@@ -85,6 +88,13 @@ export function ModelList({
               px="xs"
               className="border-solid border-0 border-b last:border-b-0 border-chatbox-border-primary"
             >
+              <ModelIcon
+                modelId={model.modelId}
+                providerId={providerId}
+                iconUrl={model.iconUrl}
+                size={28}
+                className="shrink-0"
+              />
               <Stack gap={4} flex="1 1 0" miw={0}>
                 <Flex gap="xs" align="center" miw={0}>
                   <Text

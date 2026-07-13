@@ -44,6 +44,7 @@ import { initOnboardingStore } from './stores/onboardingStore'
 import { initRecentDirectoriesStore } from './stores/recentDirectoriesStore'
 import { initSettingsStore } from './stores/settingsStore'
 import { initUpdateListeners } from './stores/updateStore'
+import { shouldInitializeMobileSafeArea } from './setup/mobile_safe_area_platform'
 
 // 开发环境下引入错误测试工具
 // if (process.env.NODE_ENV === 'development') {
@@ -53,8 +54,8 @@ import { initUpdateListeners } from './stores/updateStore'
 // Token estimation system initialization (runs in all environments)
 import('./setup/token_estimation_init')
 
-// 引入移动端安全区域代码，主要为了解决异形屏幕的问题
-if (CHATBOX_BUILD_TARGET === 'mobile_app' && CHATBOX_BUILD_PLATFORM === 'ios') {
+// Initialize native window insets for both mobile platforms.
+if (shouldInitializeMobileSafeArea(CHATBOX_BUILD_TARGET, CHATBOX_BUILD_PLATFORM)) {
   import('./setup/mobile_safe_area')
 }
 

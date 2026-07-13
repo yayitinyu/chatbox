@@ -1,0 +1,10 @@
+{
+  "appId": "com.nanami.sakurabox",
+  "appName": "SakuraBox",
+  "webDir": "release/app/dist/renderer",
+  "plugins": {
+    "Keyboard": {
+      "resizeOnFullScreen": true
+    }
+  }
+}

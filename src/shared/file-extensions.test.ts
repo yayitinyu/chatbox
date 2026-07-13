@@ -15,6 +15,7 @@ import {
   officeExts,
   sessionAttachmentRagExts,
   textExts,
+  textFileNames,
   unsupportedPatterns,
 } from './file-extensions'
 
@@ -32,6 +33,10 @@ describe('file-extensions', () => {
       expect(textExts).toContain('.md')
       expect(textExts).toContain('.json')
       expect(textExts).toContain('.tsx')
+      expect(textExts).toContain('.jsonl')
+      expect(textExts).toContain('.vtt')
+      expect(textExts).toContain('.ipynb')
+      expect(textFileNames).toContain('dockerfile')
     })
 
     it('contains expanded session attachment RAG whitelist extensions', () => {
@@ -56,8 +61,8 @@ describe('file-extensions', () => {
       }
     })
 
-    it('builds allSupportedExts as office + text + epub', () => {
-      expect(allSupportedExts).toEqual([...officeExts, ...textExts, ...epubExts])
+    it('builds allSupportedExts as modern office + legacy office + text + epub', () => {
+      expect(allSupportedExts).toEqual([...officeExts, ...legacyOfficeExts, ...textExts, ...epubExts])
     })
 
     it('defines unsupported patterns for known categories', () => {
@@ -104,9 +109,11 @@ describe('file-extensions', () => {
       expect(isTextFilePath('src/app.TSX')).toBe(true)
     })
 
-    it('returns false for unsupported and extensionless files', () => {
+    it('supports known extensionless text files and rejects unknown ones', () => {
       expect(isTextFilePath('video.mp4')).toBe(false)
-      expect(isTextFilePath('LICENSE')).toBe(false)
+      expect(isTextFilePath('LICENSE')).toBe(true)
+      expect(isTextFilePath('/repo/Dockerfile')).toBe(true)
+      expect(isTextFilePath('unknown')).toBe(false)
       expect(isTextFilePath('')).toBe(false)
     })
   })
@@ -165,6 +172,9 @@ describe('file-extensions', () => {
       expect(isSupportedFile('report.pdf')).toBe(true)
       expect(isSupportedFile('notes.md')).toBe(true)
       expect(isSupportedFile('novel.epub')).toBe(true)
+      expect(isSupportedFile('legacy.doc')).toBe(true)
+      expect(isSupportedFile('notebook.ipynb')).toBe(true)
+      expect(isSupportedFile('Dockerfile')).toBe(true)
     })
 
     it('returns true for numbers files', () => {
@@ -172,10 +182,10 @@ describe('file-extensions', () => {
       expect(isSupportedFile('BUDGET.NUMBERS')).toBe(true)
     })
 
-    it('returns false for unsupported or extensionless names', () => {
+    it('returns false for unsupported or unknown extensionless names', () => {
       expect(isSupportedFile('song.mp3')).toBe(false)
       expect(isSupportedFile('archive.zip')).toBe(false)
-      expect(isSupportedFile('README')).toBe(false)
+      expect(isSupportedFile('unknown')).toBe(false)
       expect(isSupportedFile('')).toBe(false)
     })
   })
@@ -188,6 +198,7 @@ describe('file-extensions', () => {
       expect(getUnsupportedFileType('installer.exe')).toBe('binary')
       expect(getUnsupportedFileType('bundle.tar.gz')).toBe('archive')
       expect(getUnsupportedFileType('design.psd')).toBe('image')
+      expect(getUnsupportedFileType('types.ts')).toBeNull()
     })
 
     it('returns null for supported, unknown, extensionless, or empty names', () => {
@@ -218,8 +229,9 @@ describe('file-extensions', () => {
 
       expect(config['image/*']).toEqual(['.jpg', '.jpeg', '.png'])
       expect(config['text/plain']).toContain('.txt')
-      expect(config['application/json']).toEqual(['.json'])
+      expect(config['application/json']).toEqual(['.json', '.jsonl', '.ndjson', '.ipynb'])
       expect(config['application/pdf']).toEqual(['.pdf'])
+      expect(config['application/msword']).toEqual(['.doc'])
       expect(config['application/vnd.apple.numbers']).toEqual(['.numbers'])
       expect(config['application/epub+zip']).toEqual(['.epub'])
     })

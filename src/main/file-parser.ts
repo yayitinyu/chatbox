@@ -2,7 +2,7 @@ import * as chardet from 'chardet'
 import Epub from 'epub'
 import * as fs from 'fs-extra'
 import * as iconv from 'iconv-lite'
-import { isEpubFilePath, isOfficeFilePath } from '../shared/file-extensions'
+import { isEpubFilePath, isLegacyOfficeFilePath, isOfficeFilePath } from '../shared/file-extensions'
 import { getLogger } from './util'
 
 const log = getLogger('file-parser')
@@ -67,6 +67,10 @@ async function concurrentMap<T, R>(
 }
 
 export async function parseFile(filePath: string) {
+  if (isLegacyOfficeFilePath(filePath) || filePath.toLowerCase().endsWith('.numbers')) {
+    throw new Error(`Local parsing is not available for this binary document format: ${filePath}`)
+  }
+
   if (isOfficeFilePath(filePath)) {
     try {
       const officeParser = await import('officeparser')

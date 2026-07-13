@@ -34,6 +34,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AdaptiveModal } from '@/components/common/AdaptiveModal'
 import { AssistantAvatar } from '@/components/common/Avatar'
+import { ImageUrlInput } from '@/components/common/ImageUrlInput'
 import LazyNumberInput from '@/components/common/LazyNumberInput'
 import MaxContextMessageCountSlider from '@/components/common/MaxContextMessageCountSlider'
 import { ScalableIcon } from '@/components/common/ScalableIcon'
@@ -178,7 +179,10 @@ const SessionSettingsModal = NiceModal.create(
                   handleImageInputAndSave(
                     file,
                     key,
-                    () => setEditingData((prev) => ({ ...prev, assistantAvatarKey: key }) as typeof prev),
+                    () =>
+                      setEditingData(
+                        (prev) => ({ ...prev, assistantAvatarKey: key, picUrl: undefined }) as typeof prev
+                      ),
                     (k, v) => storage.setBlob(k, v)
                   )
                 }
@@ -195,7 +199,7 @@ const SessionSettingsModal = NiceModal.create(
                       {...props}
                     />
 
-                    {editingData.assistantAvatarKey && (
+                    {(editingData.assistantAvatarKey || editingData.picUrl) && (
                       <ActionIcon
                         color="chatbox-error"
                         size={24}
@@ -204,7 +208,7 @@ const SessionSettingsModal = NiceModal.create(
                         right={0}
                         className="absolute"
                         onClick={() => {
-                          setEditingData({ ...editingData, assistantAvatarKey: undefined })
+                          setEditingData({ ...editingData, assistantAvatarKey: undefined, picUrl: undefined })
                         }}
                       >
                         <ScalableIcon icon={IconTrash} size={18} />
@@ -214,6 +218,11 @@ const SessionSettingsModal = NiceModal.create(
                 </Flex>
               )}
             </FileButton>
+
+            <ImageUrlInput
+              value={editingData.picUrl}
+              onApply={(url) => setEditingData({ ...editingData, assistantAvatarKey: undefined, picUrl: url })}
+            />
 
             <Stack gap="xs">
               <Text fw={700}>{t('Name')}</Text>
@@ -325,12 +334,21 @@ const SessionSettingsModal = NiceModal.create(
                   )}
                 </FileButton>
 
-                {editingData.backgroundImage?.type === 'storage-key' ? (
+                {editingData.backgroundImage ? (
                   <Box w={48} h={48} className="relative overflow-hidden rounded bg-chatbox-tertiary/20 flex-shrink-0">
-                    <ImageInStorage
-                      storageKey={editingData.backgroundImage.storageKey}
-                      className="object-cover w-full h-full"
-                    />
+                    {editingData.backgroundImage.type === 'storage-key' ? (
+                      <ImageInStorage
+                        storageKey={editingData.backgroundImage.storageKey}
+                        className="object-cover w-full h-full"
+                      />
+                    ) : (
+                      <Box
+                        component="img"
+                        src={editingData.backgroundImage.url}
+                        alt=""
+                        className="object-cover w-full h-full"
+                      />
+                    )}
 
                     <ActionIcon
                       color="chatbox-error"
@@ -353,6 +371,10 @@ const SessionSettingsModal = NiceModal.create(
                   </Box>
                 ) : null}
               </Flex>
+              <ImageUrlInput
+                value={editingData.backgroundImage?.type === 'url' ? editingData.backgroundImage.url : undefined}
+                onApply={(url) => setEditingData({ ...editingData, backgroundImage: { type: 'url', url } })}
+              />
             </Stack>
           </Stack>
         </div>

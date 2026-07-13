@@ -1,10 +1,11 @@
 import { ActionIcon, Box, Flex, ScrollArea, Stack, Text, UnstyledButton } from '@mantine/core'
 import type { ImageGeneration } from '@shared/types'
-import { IconPlus, IconServer } from '@tabler/icons-react'
+import { IconPlus } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 import { Drawer } from 'vaul'
-import { ScalableIcon } from '@/components/common/ScalableIcon'
-import ProviderIcon from '@/components/icons/ProviderIcon'
+import { ModelIcon } from '@/components/icons/ModelIcon'
+import ProviderImageIcon from '@/components/icons/ProviderImageIcon'
+import type { ImageModelGroup } from '@/hooks/useImageModelGroups'
 import { HistoryListContent } from './HistoryPanel'
 
 /* ============================================
@@ -103,12 +104,7 @@ export function MobileHistoryDrawer({
 export interface MobileModelDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  modelGroups: {
-    label: string
-    providerId: string
-    isCustom?: boolean
-    models: { modelId: string; displayName: string }[]
-  }[]
+  modelGroups: ImageModelGroup[]
   selectedProvider: string
   selectedModel: string
   onSelect: (provider: string, model: string) => void
@@ -151,11 +147,12 @@ export function MobileModelDrawer({
               {modelGroups.map((group, groupIndex) => (
                 <Stack key={group.providerId} gap={2}>
                   <Flex align="center" gap={6} px="sm">
-                    {group.isCustom ? (
-                      <ScalableIcon icon={IconServer} size={14} className="text-chatbox-tint-gray" />
-                    ) : (
-                      <ProviderIcon size={14} provider={group.providerId} className="opacity-50" />
-                    )}
+                    <ProviderImageIcon
+                      size={14}
+                      provider={group.providerId}
+                      providerName={group.label}
+                      className="opacity-60"
+                    />
                     <Text size="xs" fw={500} c="dimmed">
                       {group.label}
                     </Text>
@@ -174,9 +171,17 @@ export function MobileModelDrawer({
                           ${isSelected ? 'bg-[var(--chatbox-background-brand-secondary)]' : 'hover:bg-[var(--chatbox-background-secondary)]'}
                         `}
                       >
-                        <Text size="sm" fw={isSelected ? 600 : 400}>
-                          {model.displayName}
-                        </Text>
+                        <Flex align="center" gap="sm">
+                          <ModelIcon
+                            modelId={model.modelId}
+                            providerId={group.providerId}
+                            iconUrl={model.iconUrl}
+                            size={20}
+                          />
+                          <Text size="sm" fw={isSelected ? 600 : 400} lineClamp={1}>
+                            {model.displayName}
+                          </Text>
+                        </Flex>
                       </UnstyledButton>
                     )
                   })}

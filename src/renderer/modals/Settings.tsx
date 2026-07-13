@@ -21,7 +21,6 @@ import useNeedRoomForWinControls from '@/hooks/useNeedRoomForWinControls'
 import { router } from '@/router'
 import { RouteComponent as SettingsChatRouteComponent } from '@/routes/settings/chat'
 import { RouteComponent as SettingsDefaultModelsRouteComponent } from '@/routes/settings/default-models'
-import { RouteComponent as SettingsDocumentParserRouteComponent } from '@/routes/settings/document-parser'
 import { RouteComponent as SettingsGeneralRouteComponent } from '@/routes/settings/general'
 import { RouteComponent as SettingsHotkeysRouteComponent } from '@/routes/settings/hotkeys'
 import { RouteComponent as SettingsIndexRouteComponent } from '@/routes/settings/index'
@@ -179,12 +178,6 @@ const SettingsKnowledgeBaseRoute = createRoute({
   getParentRoute: () => RootRoute,
 })
 
-const SettingsDocumentParserRoute = createRoute({
-  component: SettingsDocumentParserRouteComponent,
-  path: '/settings/document-parser',
-  getParentRoute: () => RootRoute,
-})
-
 const SettingsHotkeysRoute = createRoute({
   component: SettingsHotkeysRouteComponent,
   path: '/settings/hotkeys',
@@ -215,10 +208,7 @@ const SettingsProviderProviderIdRoute = createRoute({
   getParentRoute: () => SettingsProviderRouteRoute,
 })
 
-SettingsProviderRouteRoute.addChildren([
-  SettingsProviderIndexRoute,
-  SettingsProviderProviderIdRoute,
-])
+SettingsProviderRouteRoute.addChildren([SettingsProviderIndexRoute, SettingsProviderProviderIdRoute])
 
 const routeTree = RootRoute.addChildren([
   SettingsIndexRoute,
@@ -228,7 +218,6 @@ const routeTree = RootRoute.addChildren([
   SettingsMcpRoute,
   SettingsSkillsRoute,
   SettingsKnowledgeBaseRoute,
-  SettingsDocumentParserRoute,
   SettingsHotkeysRoute,
   SettingsDefaultModelsRoute,
   SettingsProviderRouteRoute,

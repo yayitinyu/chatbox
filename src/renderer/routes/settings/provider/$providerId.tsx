@@ -51,8 +51,10 @@ import { trackJkClickEvent } from '@/analytics/jk'
 import { JK_EVENTS, JK_PAGE_NAMES } from '@/analytics/jk-events'
 import { AdaptiveSelect } from '@/components/AdaptiveSelect'
 import { AdaptiveModal } from '@/components/common/AdaptiveModal'
+import { ImageUrlInput } from '@/components/common/ImageUrlInput'
 import PopoverConfirm from '@/components/common/PopoverConfirm'
 import { ScalableIcon } from '@/components/common/ScalableIcon'
+import ProviderImageIcon from '@/components/icons/ProviderImageIcon'
 import { ModelList } from '@/components/ModelList'
 import { useOAuth } from '@/hooks/useOAuth'
 import { useOAuthProviders } from '@/hooks/useOAuthProviders'
@@ -309,6 +311,19 @@ function ProviderSettings({ providerId }: { providerId: string }) {
       apiPath: e.currentTarget.value,
     })
   }
+
+  const providerIconUrl = providerSettings?.iconUrl || (baseInfo?.isCustom ? baseInfo.iconUrl : undefined)
+
+  const handleClearProviderIcon = () => {
+    setProviderSettings({ iconUrl: undefined })
+    if (baseInfo?.isCustom && baseInfo.iconUrl) {
+      setSettings({
+        customProviders: customProviders?.map((provider) =>
+          provider.id === baseInfo.id ? { ...provider, iconUrl: undefined } : provider
+        ),
+      })
+    }
+  }
   const normalizedBuiltinApiHost = baseInfo
     ? normalizeAPIHost(
         {
@@ -522,6 +537,26 @@ function ProviderSettings({ providerId }: { providerId: string }) {
       )}
 
       <Stack gap="xl">
+        <Stack gap="xs">
+          <Text span fw="600">
+            {t('Provider Icon')}
+          </Text>
+          <Flex align="center" gap="md" wrap="wrap">
+            <ProviderImageIcon provider={providerId} providerName={baseInfo.name} size={40} />
+            <Stack gap={0} flex={1} miw={240}>
+              <ImageUrlInput
+                label={t('Provider icon URL')}
+                value={providerIconUrl}
+                onApply={(iconUrl) => setProviderSettings({ iconUrl })}
+                onClear={handleClearProviderIcon}
+              />
+            </Stack>
+          </Flex>
+          <Text size="xs" c="dimmed">
+            {t('Used as the fallback for models without their own icon.')}
+          </Text>
+        </Stack>
+
         {/* custom provider base info */}
         {baseInfo.isCustom && (
           <>
@@ -971,6 +1006,7 @@ function ProviderSettings({ providerId }: { providerId: string }) {
 
           <ModelList
             models={displayModels}
+            providerId={providerId}
             showActions={true}
             showSearch={false}
             onEditModel={editModel}
@@ -989,6 +1025,7 @@ function ProviderSettings({ providerId }: { providerId: string }) {
         >
           <ModelList
             models={fetchedModels || []}
+            providerId={providerId}
             showActions={true}
             showSearch={true}
             displayedModelIds={displayModels.map((m) => m.modelId)}

@@ -9,7 +9,6 @@ import type {
   SessionThreadBrief,
   Settings,
 } from '@shared/types'
-import type { DocumentParserConfig } from '@shared/types/settings'
 import { getMessageText, migrateMessage } from '@shared/utils/message'
 import { pick } from 'lodash'
 import i18n from '@/i18n'
@@ -31,7 +30,7 @@ import { createMessage, type Message, SessionSettingsSchema, TOKEN_CACHE_KEYS } 
 import type { AttachmentPreparationResult, PreprocessedFile } from '../types/input-box'
 import { lastUsedModelStore } from './lastUsedModelStore'
 import * as settingActions from './settingActions'
-import { getPlatformDefaultDocumentParser, settingsStore } from './settingsStore'
+import { settingsStore } from './settingsStore'
 
 const log = getLogger('session-helpers')
 const SESSION_ATTACHMENT_RAG_INLINE_BYTE_THRESHOLD = 256 * 1024
@@ -114,11 +113,6 @@ export function computePreviewMetadata(
   tokenCalculatedAt.deepseek_preview = now
 
   return { lineCount, byteLength, tokenCountMap, tokenCalculatedAt }
-}
-
-function getEffectiveDocumentParserConfig(): DocumentParserConfig {
-  const globalConfig = settingsStore.getState().extension?.documentParser
-  return globalConfig ?? getPlatformDefaultDocumentParser()
 }
 
 function hasParsedText(content: string): boolean {
@@ -269,39 +263,6 @@ async function parseFileWithChatboxAI(
 }
 
 /**
- * Parse file using MinerU service (Desktop only)
- */
-async function parseFileWithMineruService(
-  file: File,
-  uniqKey: string,
-  apiToken: string
-): Promise<{ content: string; storageKey: string; tokenCountMap: Record<string, number>; parserType: string }> {
-  // Check if platform supports MinerU parsing
-  if (!platform.parseFileWithMineru) {
-    throw new Error('third_party_parser_not_supported_in_chat')
-  }
-
-  // Call platform method to parse file
-  const result = await platform.parseFileWithMineru(file, apiToken)
-
-  // Handle cancellation - throw a special error that will be caught silently
-  if (result.cancelled) {
-    throw new Error('parsing_cancelled')
-  }
-
-  if (!result.success || !result.content) {
-    throw new Error('third_party_parser_failed')
-  }
-
-  const content = result.content
-
-  // Store content to unique key
-  await storage.setBlob(uniqKey, content)
-
-  return { content, storageKey: uniqKey, tokenCountMap: {}, parserType: 'mineru' }
-}
-
-/**
  * 预处理文件以获取内容和存储键
  * @param file 文件对象
  * @param settings 会话设置
@@ -370,56 +331,9 @@ export async function prepareFileAttachment(
       }
     }
 
-    let result: { content: string; storageKey: string; tokenCountMap: Record<string, number>; parserType: string }
-    if (isTextFilePath(file.name)) {
-      log.debug(`Text file detected, using local parser: ${file.name}`)
-      result = await parseFileWithLocalFallback(file, uniqKey)
-    } else {
-      const parserConfig = getEffectiveDocumentParserConfig()
-      log.debug(`Using document parser: ${parserConfig.type} for file: ${file.name}`)
-
-      switch (parserConfig.type) {
-        case 'none': {
-          throw new Error('document_parser_not_configured')
-        }
-
-        case 'local': {
-          result = await parseFileWithLocalFallback(file, uniqKey)
-          break
-        }
-
-        case 'chatbox-ai': {
-          try {
-            result = await parseFileWithChatboxAI(file, uniqKey)
-          } catch (error) {
-            log.error(`Chatbox AI parsing failed for "${file.name}":`, error)
-            throw new Error('chatbox_ai_parser_failed')
-          }
-          break
-        }
-
-        case 'mineru': {
-          const apiToken = parserConfig.mineru?.apiToken
-          if (!apiToken) {
-            throw new Error('mineru_api_token_required')
-          }
-          try {
-            result = await parseFileWithMineruService(file, uniqKey, apiToken)
-          } catch (error) {
-            log.error(`MinerU parsing failed for "${file.name}":`, error)
-            if (error instanceof Error && error.message.startsWith('third_party_parser')) {
-              throw error
-            }
-            throw new Error('third_party_parser_failed')
-          }
-          break
-        }
-
-        default: {
-          throw new Error('document_parser_not_configured')
-        }
-      }
-    }
+    const fileKind = isTextFilePath(file.name) ? 'text' : 'document'
+    log.debug(`Automatically parsing ${fileKind} file with local-first fallback: ${file.name}`)
+    const result = await parseFileWithLocalFallback(file, uniqKey)
 
     const stats = getContentStats(result.content)
     const sessionAttachmentWarningReason = isParsedContentVeryLarge(stats)

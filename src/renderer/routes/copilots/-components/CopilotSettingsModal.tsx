@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { v4 as uuidv4 } from 'uuid'
 import { AdaptiveModal } from '@/components/common/AdaptiveModal'
+import { ImageUrlInput } from '@/components/common/ImageUrlInput'
 import { ScalableIcon } from '@/components/common/ScalableIcon'
 import { handleImageInputAndSave, ImageInStorage } from '@/components/Image'
 import { useIsSmallScreen } from '@/hooks/useScreenChange'
@@ -161,7 +162,7 @@ const CopilotSettingsModal = NiceModal.create(
           />
 
           {/* Icon and Background Image */}
-          <Flex gap="xl">
+          <Flex gap="xl" wrap="wrap">
             {/* Icon Upload */}
             <Stack gap="xs" className="flex-1">
               <Text size="sm" fw={500}>
@@ -209,6 +210,13 @@ const CopilotSettingsModal = NiceModal.create(
                   )}
                 </FileButton>
               </Flex>
+              <ImageUrlInput
+                value={formData.avatar?.type === 'url' ? formData.avatar.url : formData.picUrl}
+                onApply={(url) => {
+                  setFormData({ ...formData, avatar: { type: 'url', url }, picUrl: undefined })
+                  setErrors((prev) => ({ ...prev, avatar: '' }))
+                }}
+              />
               {errors.avatar && (
                 <Text size="xs" c="red">
                   {errors.avatar}
@@ -260,6 +268,10 @@ const CopilotSettingsModal = NiceModal.create(
                   )}
                 </FileButton>
               </Flex>
+              <ImageUrlInput
+                value={formData.backgroundImage?.type === 'url' ? formData.backgroundImage.url : undefined}
+                onApply={(url) => updateField('backgroundImage', { type: 'url', url })}
+              />
               {errors.backgroundImage && (
                 <Text size="xs" c="red">
                   {errors.backgroundImage}

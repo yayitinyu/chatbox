@@ -1,9 +1,9 @@
 import { Flex, Text } from '@mantine/core'
-import { IconChevronDown, IconServer, IconStarFilled } from '@tabler/icons-react'
+import { IconChevronDown, IconStarFilled } from '@tabler/icons-react'
 import clsx from 'clsx'
 import Divider from '../common/Divider'
-import ProviderIcon from '../icons/ProviderIcon'
 import { ScalableIcon } from '../common/ScalableIcon'
+import ProviderImageIcon from '../icons/ProviderImageIcon'
 
 interface ProviderHeaderProps {
   provider: {
@@ -107,13 +107,13 @@ export const ProviderHeader = ({
         )}
         {isFavorite ? (
           <ScalableIcon icon={IconStarFilled} size={iconSize} className={iconClass} />
-        ) : provider.isCustom ? (
-          <ScalableIcon icon={IconServer} size={iconSize} className={iconClass} />
         ) : (
-          // ProviderIcon renders its own SVG icon per provider.id and doesn't conform
-          // to tabler's IconProps interface, so we render it directly instead of
-          // wrapping in ScalableIcon which expects a tabler-compatible icon component.
-          <ProviderIcon size={iconSize} provider={provider.id} className={iconClass} />
+          <ProviderImageIcon
+            size={iconSize}
+            provider={provider.id}
+            providerName={provider.name}
+            className={iconClass}
+          />
         )}
         <Text span c={textColor} size="sm" fw={textWeight}>
           {provider.name}

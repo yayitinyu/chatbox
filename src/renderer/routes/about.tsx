@@ -1,6 +1,7 @@
 import { Box, Container, Flex, Image, SimpleGrid, Stack, Text, Title } from '@mantine/core'
 import { IconBrush, IconMarkdown, IconPhotoSpark, IconShieldLock } from '@tabler/icons-react'
 import { createFileRoute } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { ScalableIcon } from '@/components/common/ScalableIcon'
 import Page from '@/components/layout/Page'
 import { useIsSmallScreen } from '@/hooks/useScreenChange'
@@ -37,9 +38,10 @@ const HIGHLIGHTS = [
 function RouteComponent() {
   const version = useVersion()
   const isSmallScreen = useIsSmallScreen()
+  const { t } = useTranslation()
 
   return (
-    <Page title="About SakuraBox">
+    <Page title={t('About SakuraBox')}>
       <Container size="md" p={0}>
         <Stack gap="xl" px={isSmallScreen ? 'sm' : 'md'} py={isSmallScreen ? 'xl' : 'md'}>
           <Flex
@@ -48,13 +50,15 @@ function RouteComponent() {
             p="lg"
             className="rounded-lg border border-solid border-chatbox-border-primary bg-chatbox-background-secondary"
           >
-            <Image src={sakuraLogo} w={88} h={88} alt="SakuraBox logo" />
+            <Image src={sakuraLogo} w={88} h={88} alt={t('SakuraBox logo')} />
             <Stack gap={4}>
               <Title order={2}>SakuraBox</Title>
-              <Text c="chatbox-secondary">A friendly, focused workspace for conversations with your AI models.</Text>
+              <Text c="chatbox-secondary">
+                {t('A friendly, focused workspace for conversations with your AI models.')}
+              </Text>
               {/\d/.test(version.version) && (
                 <Text size="xs" c="chatbox-tertiary">
-                  Version {version.version}
+                  {t('Version {{version}}', { version: version.version })}
                 </Text>
               )}
             </Stack>
@@ -77,9 +81,9 @@ function RouteComponent() {
                   <ScalableIcon icon={item.icon} size={20} />
                 </Box>
                 <Stack gap={3}>
-                  <Text fw={700}>{item.title}</Text>
+                  <Text fw={700}>{t(item.title)}</Text>
                   <Text size="sm" c="chatbox-secondary">
-                    {item.description}
+                    {t(item.description)}
                   </Text>
                 </Stack>
               </Flex>
@@ -87,10 +91,11 @@ function RouteComponent() {
           </SimpleGrid>
 
           <Stack gap="xs" p="md" className="rounded-md bg-chatbox-background-secondary">
-            <Text fw={700}>Open-source foundation</Text>
+            <Text fw={700}>{t('Open-source foundation')}</Text>
             <Text size="sm" c="chatbox-secondary">
-              SakuraBox is built from the open-source Chatbox project. Original licenses and notices remain in the
-              repository LICENSE file.
+              {t(
+                'SakuraBox is built from the open-source Chatbox project. Original licenses and notices remain in the repository LICENSE file.'
+              )}
             </Text>
           </Stack>
         </Stack>

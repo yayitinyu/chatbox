@@ -76,8 +76,11 @@ export function settings(): Settings {
     showAvatar: true,
     // messageLayout: 'left' as const, // 不设置默认值，这样可以通过判断这个值是否为空来判断是否通过了新功能引导
     userAvatarKey: '',
+    userAvatarUrl: '',
     defaultAssistantAvatarKey: '',
+    defaultAssistantAvatarUrl: '',
     backgroundImageKey: '',
+    backgroundImageUrl: '',
     theme: Theme.System,
     language: 'en',
     fontSize: 14,

@@ -65,6 +65,7 @@ import { blobToDataUrl } from './image-creator/-components/constants'
 function BackgroundImageOverlay() {
   const location = useLocation()
   const globalBackgroundImageKey = useSettingsStore((s) => s.backgroundImageKey)
+  const globalBackgroundImageUrl = useSettingsStore((s) => s.backgroundImageUrl)
   const showSidebar = useUIStore((s) => s.showSidebar)
   const sidebarWidth = useSidebarWidth()
   const isRootPage = location.pathname === '/'
@@ -93,7 +94,9 @@ function BackgroundImageOverlay() {
       ? session.backgroundImage.url
       : effectiveKey && blob
         ? blobToDataUrl(blob)
-        : undefined
+        : session?.backgroundImage
+          ? undefined
+          : globalBackgroundImageUrl
 
   if (!isRootPage && !isSessionPage) return null
   if (!imageUrl) return null

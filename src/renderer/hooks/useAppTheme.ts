@@ -5,6 +5,7 @@ import { uiStore, useUIStore } from '@/stores/uiStore'
 import { type Language, Theme } from '../../shared/types'
 import platform from '../platform'
 import DesktopPlatform from '../platform/desktop_platform'
+import { syncMobileSystemBarsTheme } from '../setup/mobile_system_bars'
 
 export const switchTheme = async (theme: Theme) => {
   let finalTheme = 'light' as 'light' | 'dark'
@@ -17,6 +18,7 @@ export const switchTheme = async (theme: Theme) => {
     realTheme: finalTheme,
   })
   localStorage.setItem('initial-theme', finalTheme)
+  await syncMobileSystemBarsTheme(finalTheme)
   if (platform instanceof DesktopPlatform) {
     await platform.switchTheme(finalTheme)
   }
@@ -29,13 +31,13 @@ export default function useAppTheme() {
   const interfaceFont = useSettingsStore((state) => state.interfaceFont)
 
   useLayoutEffect(() => {
-    switchTheme(theme)
+    void switchTheme(theme)
   }, [theme])
 
   useLayoutEffect(() => {
     platform.onSystemThemeChange(() => {
       const theme = settingsStore.getState().theme
-      switchTheme(theme)
+      void switchTheme(theme)
     })
   }, [])
 

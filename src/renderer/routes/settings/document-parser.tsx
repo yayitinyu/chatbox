@@ -1,10 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { DocumentParserSettings } from '@/components/settings/DocumentParserSettings'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/settings/document-parser')({
-  component: RouteComponent,
+  beforeLoad: () => {
+    throw redirect({ to: '/settings/provider' })
+  },
+  component: () => null,
 })
-
-export function RouteComponent() {
-  return <DocumentParserSettings showTitle={false} />
-}

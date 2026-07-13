@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next'
 import { createModelDependencies } from '@/adapters'
 import { AdaptiveSelect } from '@/components/AdaptiveSelect'
 import { AdaptiveModal } from '@/components/common/AdaptiveModal'
+import { ImageUrlInput } from '@/components/common/ImageUrlInput'
+import { ModelIcon } from '@/components/icons/ModelIcon'
 import platform from '@/platform'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { type ModelTestState, testModelCapabilities } from '@/utils/model-tester'
@@ -18,6 +20,7 @@ const ModelEdit = NiceModal.create((props: { model?: ProviderModelInfo; provider
   const isNew = !props.model
   const [modelId, setModelId] = useState(props.model?.modelId || '')
   const [nickname, setNickname] = useState(props.model?.nickname || '')
+  const [iconUrl, setIconUrl] = useState(props.model?.iconUrl)
   const [capabilities, setCapabilities] = useState(props.model?.capabilities || [])
   const [type, setType] = useState<ProviderModelInfo['type']>(props.model?.type || 'chat')
   const [contextWindow, setContextWindow] = useState<number | undefined>(props.model?.contextWindow)
@@ -36,6 +39,7 @@ const ModelEdit = NiceModal.create((props: { model?: ProviderModelInfo; provider
   useEffect(() => {
     setModelId(props.model?.modelId || '')
     setNickname(props.model?.nickname || '')
+    setIconUrl(props.model?.iconUrl)
     setCapabilities(props.model?.capabilities || [])
     setType(props.model?.type || 'chat')
     setContextWindow(props.model?.contextWindow)
@@ -79,6 +83,7 @@ const ModelEdit = NiceModal.create((props: { model?: ProviderModelInfo; provider
       modelId,
       type,
       nickname: nickname || undefined,
+      iconUrl,
       capabilities,
       contextWindow,
       maxOutput,
@@ -117,6 +122,24 @@ const ModelEdit = NiceModal.create((props: { model?: ProviderModelInfo; provider
               onChange={(e) => setNickname(e.target.value)}
             />
           </Flex>
+        </Stack>
+
+        <Stack gap="xs">
+          <Text fw="600">{t('Model Icon')}</Text>
+          <Flex align="center" gap="md" wrap="wrap">
+            <ModelIcon modelId={modelId || '?'} providerId={props.providerId} iconUrl={iconUrl} size={40} />
+            <Stack gap={0} flex={1} miw={240}>
+              <ImageUrlInput
+                label={t('Model icon URL')}
+                value={iconUrl}
+                onApply={setIconUrl}
+                onClear={() => setIconUrl(undefined)}
+              />
+            </Stack>
+          </Flex>
+          <Text size="xs" c="dimmed">
+            {t('When empty, a recognized model icon or the provider icon will be used.')}
+          </Text>
         </Stack>
 
         {/* Model Type */}

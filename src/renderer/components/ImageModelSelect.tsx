@@ -1,20 +1,16 @@
 import { Combobox, type ComboboxProps, Flex, Text, useCombobox } from '@mantine/core'
 import type { ModelProvider } from '@shared/types'
-import { IconPlus, IconServer } from '@tabler/icons-react'
+import { IconPlus } from '@tabler/icons-react'
 import { forwardRef, type PropsWithChildren } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ImageModelGroup } from '@/hooks/useImageModelGroups'
-import { ScalableIcon } from './common/ScalableIcon'
-import ProviderIcon from './icons/ProviderIcon'
+import { ModelIcon } from './icons/ModelIcon'
+import ProviderImageIcon from './icons/ProviderImageIcon'
 
-function ProviderGroupLabel({ providerId, name, isCustom }: { providerId: string; name: string; isCustom?: boolean }) {
+function ProviderGroupLabel({ providerId, name }: { providerId: string; name: string }) {
   return (
     <Flex align="center" gap={6} className="px-2 pt-2.5 pb-1">
-      {isCustom ? (
-        <ScalableIcon icon={IconServer} size={12} className="text-chatbox-tint-gray" />
-      ) : (
-        <ProviderIcon size={12} provider={providerId} className="opacity-50" />
-      )}
+      <ProviderImageIcon size={12} provider={providerId} providerName={name} className="opacity-60" />
       <Text size="xs" fw={500} c="dimmed">
         {name}
       </Text>
@@ -71,14 +67,24 @@ export const ImageModelSelect = forwardRef<HTMLButtonElement, ImageModelSelectPr
             ) : (
               modelGroups.map((group) => (
                 <div key={group.providerId}>
-                  <ProviderGroupLabel providerId={group.providerId} name={group.label} isCustom={group.isCustom} />
+                  <ProviderGroupLabel providerId={group.providerId} name={group.label} />
                   {group.models.map((model) => (
                     <Combobox.Option
                       key={`${group.providerId}:${model.modelId}`}
                       value={JSON.stringify({ provider: group.providerId, modelId: model.modelId })}
                       className="!rounded-lg"
                     >
-                      <Text size="sm">{model.displayName}</Text>
+                      <Flex align="center" gap="xs">
+                        <ModelIcon
+                          modelId={model.modelId}
+                          providerId={group.providerId}
+                          iconUrl={model.iconUrl}
+                          size={18}
+                        />
+                        <Text size="sm" lineClamp={1}>
+                          {model.displayName}
+                        </Text>
+                      </Flex>
                     </Combobox.Option>
                   ))}
                 </div>

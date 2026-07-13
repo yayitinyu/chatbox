@@ -1,16 +1,16 @@
-import { Button, Flex, Image, Indicator, ScrollArea, Stack, Text } from '@mantine/core'
+import { Button, Flex, Indicator, ScrollArea, Stack, Text } from '@mantine/core'
 import type { ProviderBaseInfo } from '@shared/types'
 import { IconChevronRight, IconPlus } from '@tabler/icons-react'
 import { Link, useRouterState } from '@tanstack/react-router'
 import clsx from 'clsx'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import CustomProviderIcon from '@/components/CustomProviderIcon'
 import Divider from '@/components/common/Divider'
 import { ScalableIcon } from '@/components/common/ScalableIcon'
+import ProviderImageIcon from '@/components/icons/ProviderImageIcon'
 import { useProviders } from '@/hooks/useProviders'
 import { useIsSmallScreen } from '@/hooks/useScreenChange'
-import { FEATURED_PROVIDER_IDS, ProviderIconImage } from './providerIcons'
+import { FEATURED_PROVIDER_IDS } from './providerIcons'
 
 interface ProviderListProps {
   providers: ProviderBaseInfo[]
@@ -80,15 +80,7 @@ export function ProviderList({ providers, onAddProvider }: ProviderListProps) {
                   provider.id === providerId ? '' : 'hover:!bg-chatbox-background-gray-secondary'
                 )}
               >
-                {provider.isCustom ? (
-                  provider.iconUrl ? (
-                    <Image w={32} h={32} src={provider.iconUrl} alt={provider.name} />
-                  ) : (
-                    <CustomProviderIcon providerId={provider.id} providerName={provider.name} size={32} />
-                  )
-                ) : (
-                  <ProviderIconImage providerId={provider.id} size={32} />
-                )}
+                <ProviderImageIcon provider={provider.id} providerName={provider.name} size={32} />
 
                 <Text
                   span

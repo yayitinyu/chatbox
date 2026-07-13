@@ -209,6 +209,21 @@ describe('preprocessFile local parser fallback', () => {
     expect(result.content).toBe('remote text content')
   })
 
+  it('uses automatic local-first parsing even when a legacy parser setting is disabled', async () => {
+    const file = createFile('automatic.pdf')
+    parserState.type = 'none'
+    blobStore.set('local-key', 'automatic local content')
+    mockParseFileLocally.mockResolvedValueOnce({ isSupported: true, key: 'local-key' })
+
+    const result = await prepareFileAttachment(file, { provider: '', modelId: '' })
+
+    expect(mockParseFileLocally).toHaveBeenCalledWith(file)
+    expect(mockUploadAndCreateUserFile).not.toHaveBeenCalled()
+    expect(result.error).toBeUndefined()
+    expect(result.content).toBe('automatic local content')
+    expect(result.parserType).toBe('local')
+  })
+
   it('keeps local_parser_failed when local parsing throws without a license', async () => {
     const file = createFile('no-license.pdf')
     licenseState.key = undefined

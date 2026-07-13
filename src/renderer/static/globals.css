@@ -10,6 +10,13 @@
   --font-math: "STIX Two Math", "Cambria Math", serif;
   --font-interface: var(--font-sans);
 
+  /* Native plugins replace these values after startup. env() prevents an
+     unsafe first frame and remains the fallback for regular mobile browsers. */
+  --mobile-safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --mobile-safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --mobile-safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --mobile-safe-area-inset-left: env(safe-area-inset-left, 0px);
+
   /* radius */
   --chatbox-radius-none: 0rem;
   --chatbox-radius-xs: 0.125rem;
@@ -72,6 +79,9 @@
   --sakura-mark-strong: rgb(255, 196, 214, 0.72);
   --sakura-mark-emphasis: #a92f59;
   --sakura-quote-surface: rgb(199, 63, 108, 0.07);
+  --sakura-citation-pink: #c73f6c;
+  --sakura-citation-purple: #7262bf;
+  --sakura-citation-blue: #4385a9;
 
   --chatbox-background-gray-primary: #868e96;
   --chatbox-background-gray-primary-hover: #495057;
@@ -138,6 +148,9 @@
   --sakura-mark-strong: rgb(190, 58, 102, 0.48);
   --sakura-mark-emphasis: #ff9bbb;
   --sakura-quote-surface: rgb(255, 133, 170, 0.09);
+  --sakura-citation-pink: #ff85aa;
+  --sakura-citation-purple: #b5a8ff;
+  --sakura-citation-blue: #8ed7f5;
 
   --chatbox-background-gray-primary: #343a40;
   --chatbox-background-gray-primary-hover: #212529;

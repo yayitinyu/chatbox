@@ -20,12 +20,12 @@ export const Page: FC<PageProps> = ({ children, title, left, right }) => {
   const isSmallScreen = useIsSmallScreen()
   const { needRoomForMacWindowControls } = useNeedRoomForWinControls()
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex min-h-0 flex-col h-full overflow-hidden">
       <Flex
         h={48}
+        className={clsx('title-bar shrink-0', isSmallScreen ? 'bg-chatbox-background-primary' : '')}
         align="center"
         px="md"
-        className={clsx('title-bar', isSmallScreen ? 'bg-chatbox-background-primary' : '')}
       >
         {left ||
           ((!showSidebar || isSmallScreen) && (
@@ -57,7 +57,7 @@ export const Page: FC<PageProps> = ({ children, title, left, right }) => {
         {isSmallScreen && !right && <Box w={28} />}
       </Flex>
 
-      <div className="flex-1 overflow-auto">{children}</div>
+      <div className="min-h-0 flex-1 overflow-auto">{children}</div>
     </div>
   )
 }

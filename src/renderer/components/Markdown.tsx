@@ -58,7 +58,7 @@ import {
 import clsx from 'clsx'
 import { visit } from 'unist-util-visit'
 import { useCopied } from '@/hooks/useCopied'
-import { normalizeMarkdownEmphasis } from '@/utils/markdown'
+import { getMarkdownCitationNumber, normalizeMarkdownEmphasis } from '@/utils/markdown'
 import { deployHtmlToEdgeOne } from '../packages/edgeone'
 import { highlight, highlightSync, type ShikiTheme } from '../packages/shiki'
 import * as toastActions from '../stores/toastActions'
@@ -106,6 +106,7 @@ function Markdown(props: {
     onCodeCopy,
     onPreviewWebpage,
   } = props
+  const { t } = useTranslation()
 
   const codeFences = useMemo(() => (children.match(/```/g) || []).length, [children])
   const generatingCodeIndex = useMemo(() => (codeFences % 2 === 0 ? -1 : Math.floor(codeFences / 2)), [codeFences])
@@ -145,16 +146,28 @@ function Markdown(props: {
               />
             )
           },
-          a: ({ node, ...props }) => (
-            <a
-              {...props}
-              target="_blank"
-              rel="noreferrer"
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
-            />
-          ),
+          a: ({ node, children: anchorChildren, className: anchorClassName, ...anchorProps }) => {
+            const citationNumber = getMarkdownCitationNumber(anchorChildren)
+            const citationLabel =
+              citationNumber === null ? undefined : t('Reference {{number}}', { number: citationNumber })
+
+            return (
+              <a
+                {...anchorProps}
+                className={clsx(anchorClassName, citationNumber !== null && 'sakura-citation')}
+                data-citation-tone={citationNumber === null ? undefined : String((citationNumber - 1) % 3)}
+                aria-label={citationLabel}
+                title={citationLabel || anchorProps.title}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e) => {
+                  e.stopPropagation()
+                }}
+              >
+                {citationNumber ?? anchorChildren}
+              </a>
+            )
+          },
         }),
         [
           uniqueId,
@@ -165,6 +178,7 @@ function Markdown(props: {
           forceColorScheme,
           onCodeCopy,
           onPreviewWebpage,
+          t,
         ]
       )}
     >

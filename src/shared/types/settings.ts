@@ -33,6 +33,7 @@ export const DEFAULT_DOCUMENT_PARSER_CONFIG: DocumentParserConfig = {
 
 export const ProviderModelInfoSchema = z.object({
   modelId: z.string(),
+  iconUrl: z.string().optional().catch(undefined),
   type: z.enum(['chat', 'embedding', 'rerank', 'image']).optional().catch(undefined),
   apiStyle: z.enum(['google', 'openai', 'openai-responses', 'anthropic']).optional().catch(undefined),
   nickname: z.string().optional().catch(undefined),
@@ -56,6 +57,7 @@ export const ProviderSettingsSchema = z.object({
   apiKey: z.string().optional().catch(undefined),
   apiHost: z.string().optional().catch(undefined),
   apiPath: z.string().optional().catch(undefined),
+  iconUrl: z.string().optional().catch(undefined),
   models: z.array(ProviderModelInfoSchema).optional().catch(undefined),
   excludedModels: z.array(z.string()).optional().catch(undefined),
   useProxy: z.boolean().optional().catch(undefined),
@@ -387,8 +389,11 @@ export const SettingsSchema = GlobalSessionSettingsSchema.extend({
   allowReportingAndTracking: z.boolean().optional(), // 是否允许错误报告和事件追踪
 
   userAvatarKey: z.string().optional(), // 用户头像的 key
+  userAvatarUrl: z.string().optional(), // 用户头像的图片直链
   defaultAssistantAvatarKey: z.string().optional(), // 默认助手头像的 key
+  defaultAssistantAvatarUrl: z.string().optional(), // 默认助手头像的图片直链
   backgroundImageKey: z.string().optional(), // 应用背景图片的 key（本地上传）
+  backgroundImageUrl: z.string().optional(), // 应用背景图片的图片直链
 
   enableMarkdownRendering: z.boolean().default(true),
   enableMermaidRendering: z.boolean().default(true),

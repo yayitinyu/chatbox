@@ -6,6 +6,7 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AssistantAvatar, UserAvatar } from '@/components/common/Avatar'
 import { Divider } from '@/components/common/Divider'
+import { ImageUrlInput } from '@/components/common/ImageUrlInput'
 import MaxContextMessageCountSlider from '@/components/common/MaxContextMessageCountSlider'
 import { MessageLayoutSelector } from '@/components/common/MessageLayoutPreview'
 import { ScalableIcon } from '@/components/common/ScalableIcon'
@@ -45,7 +46,7 @@ export function RouteComponent() {
             {t('User Avatar')}
           </Text>
           <Flex align="center" gap="xs">
-            <UserAvatar size={56} avatarKey={settings.userAvatarKey} />
+            <UserAvatar size={56} avatarKey={settings.userAvatarKey} picUrl={settings.userAvatarUrl} />
             <FileButton
               onChange={(file) => {
                 if (file) {
@@ -57,7 +58,7 @@ export function RouteComponent() {
                   handleImageInputAndSave(
                     file,
                     key,
-                    () => setSettings({ userAvatarKey: key }),
+                    () => setSettings({ userAvatarKey: key, userAvatarUrl: undefined }),
                     (k, v) => storage.setBlob(k, v)
                   )
                 }
@@ -70,12 +71,20 @@ export function RouteComponent() {
                 </Button>
               )}
             </FileButton>
-            {!!settings.userAvatarKey && (
-              <Button color="chatbox-gray" size="xs" onClick={() => setSettings({ userAvatarKey: undefined })}>
+            {!!(settings.userAvatarKey || settings.userAvatarUrl) && (
+              <Button
+                color="chatbox-gray"
+                size="xs"
+                onClick={() => setSettings({ userAvatarKey: undefined, userAvatarUrl: undefined })}
+              >
                 {t('Delete')}
               </Button>
             )}
           </Flex>
+          <ImageUrlInput
+            value={settings.userAvatarUrl}
+            onApply={(url) => setSettings({ userAvatarKey: undefined, userAvatarUrl: url })}
+          />
         </Stack>
 
         {/* Default Assistant Avatar */}
@@ -84,7 +93,11 @@ export function RouteComponent() {
             {t('Default Assistant Avatar')}
           </Text>
           <Flex align="center" gap="xs">
-            <AssistantAvatar avatarKey={settings.defaultAssistantAvatarKey} size={56} />
+            <AssistantAvatar
+              avatarKey={settings.defaultAssistantAvatarKey}
+              picUrl={settings.defaultAssistantAvatarUrl}
+              size={56}
+            />
             <FileButton
               onChange={(file) => {
                 if (file) {
@@ -96,7 +109,7 @@ export function RouteComponent() {
                   handleImageInputAndSave(
                     file,
                     key,
-                    () => setSettings({ defaultAssistantAvatarKey: key }),
+                    () => setSettings({ defaultAssistantAvatarKey: key, defaultAssistantAvatarUrl: undefined }),
                     (k, v) => storage.setBlob(k, v)
                   )
                 }
@@ -109,16 +122,22 @@ export function RouteComponent() {
                 </Button>
               )}
             </FileButton>
-            {!!settings.defaultAssistantAvatarKey && (
+            {!!(settings.defaultAssistantAvatarKey || settings.defaultAssistantAvatarUrl) && (
               <Button
                 color="chatbox-gray"
                 size="xs"
-                onClick={() => setSettings({ defaultAssistantAvatarKey: undefined })}
+                onClick={() =>
+                  setSettings({ defaultAssistantAvatarKey: undefined, defaultAssistantAvatarUrl: undefined })
+                }
               >
                 {t('Delete')}
               </Button>
             )}
           </Flex>
+          <ImageUrlInput
+            value={settings.defaultAssistantAvatarUrl}
+            onApply={(url) => setSettings({ defaultAssistantAvatarKey: undefined, defaultAssistantAvatarUrl: url })}
+          />
         </Stack>
       </Stack>
 
@@ -210,9 +229,18 @@ export function RouteComponent() {
         <Stack gap="xs">
           <Text>{t('Background Image')}</Text>
           <Flex align="center" gap="sm" wrap="wrap">
-            {settings.backgroundImageKey ? (
+            {settings.backgroundImageKey || settings.backgroundImageUrl ? (
               <Box w={160} h={90} className="overflow-hidden rounded bg-chatbox-tertiary/20 flex-shrink-0">
-                <ImageInStorage storageKey={settings.backgroundImageKey} className="object-cover w-full h-full" />
+                {settings.backgroundImageKey ? (
+                  <ImageInStorage storageKey={settings.backgroundImageKey} className="object-cover w-full h-full" />
+                ) : (
+                  <Box
+                    component="img"
+                    src={settings.backgroundImageUrl}
+                    alt=""
+                    className="object-cover w-full h-full"
+                  />
+                )}
               </Box>
             ) : null}
             <Flex gap="xs" align="center">
@@ -227,7 +255,7 @@ export function RouteComponent() {
                     handleImageInputAndSave(
                       file,
                       key,
-                      () => setSettings({ backgroundImageKey: key }),
+                      () => setSettings({ backgroundImageKey: key, backgroundImageUrl: undefined }),
                       (k, v) => storage.setBlob(k, v)
                     )
                   }
@@ -240,13 +268,21 @@ export function RouteComponent() {
                   </Button>
                 )}
               </FileButton>
-              {!!settings.backgroundImageKey && (
-                <Button color="chatbox-gray" size="xs" onClick={() => setSettings({ backgroundImageKey: undefined })}>
+              {!!(settings.backgroundImageKey || settings.backgroundImageUrl) && (
+                <Button
+                  color="chatbox-gray"
+                  size="xs"
+                  onClick={() => setSettings({ backgroundImageKey: undefined, backgroundImageUrl: undefined })}
+                >
                   {t('Remove')}
                 </Button>
               )}
             </Flex>
           </Flex>
+          <ImageUrlInput
+            value={settings.backgroundImageUrl}
+            onApply={(url) => setSettings({ backgroundImageKey: undefined, backgroundImageUrl: url })}
+          />
         </Stack>
 
         {/* Stream output */}

@@ -3,8 +3,8 @@ import type { ProviderModelInfo } from '@shared/types'
 import { IconBulb, IconEye, IconStar, IconStarFilled, IconTool } from '@tabler/icons-react'
 import clsx from 'clsx'
 import { useTranslation } from 'react-i18next'
-import { ModelIcon } from '../icons/ModelIcon'
 import { ScalableIcon } from '../common/ScalableIcon'
+import { ModelIcon } from '../icons/ModelIcon'
 
 // Common styles
 export const SELECTED_BG_CLASS = '!bg-chatbox-background-brand-secondary'
@@ -58,7 +58,13 @@ export const ModelItem = ({
         isSelected && SELECTED_BG_CLASS
       )}
     >
-      <ModelIcon modelId={model.modelId} providerId={providerId} size={16} className="mr-xs flex-shrink-0" />
+      <ModelIcon
+        modelId={model.modelId}
+        providerId={providerId}
+        iconUrl={model.iconUrl}
+        size={16}
+        className="mr-xs flex-shrink-0"
+      />
       <Text
         span
         className="flex-shrink"
@@ -167,7 +173,13 @@ export const ModelItemInDrawer = ({
         onSelect?.()
       }}
     >
-      <ModelIcon modelId={model.modelId} providerId={providerId} size={20} className="flex-shrink-0" />
+      <ModelIcon
+        modelId={model.modelId}
+        providerId={providerId}
+        iconUrl={model.iconUrl}
+        size={20}
+        className="flex-shrink-0"
+      />
 
       <Text span size="md" className="flex-grow-0 flex-shrink text-left overflow-hidden break-words !text-inherit">
         {model.nickname || model.modelId}

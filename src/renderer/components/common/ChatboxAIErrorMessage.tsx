@@ -102,7 +102,7 @@ export const ChatboxAIErrorMessage: FC<ChatboxAIErrorMessageProps> = ({
             type="button"
             className="cursor-pointer italic"
             onClick={() => {
-              navigateToSettings('/document-parser')
+              navigateToSettings('/provider')
             }}
           />
         ),

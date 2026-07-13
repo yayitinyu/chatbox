@@ -9,6 +9,7 @@ import { useProviders } from './useProviders'
 export interface ImageModelOption {
   modelId: string
   displayName: string
+  iconUrl?: string
 }
 
 export interface ImageModelGroup {
@@ -22,6 +23,7 @@ function remoteImageModelToOption(model: RemoteModelInfo): ImageModelOption {
   return {
     modelId: model.modelId,
     displayName: model.modelName || model.modelId,
+    iconUrl: model.iconUrl,
   }
 }
 
@@ -29,6 +31,7 @@ function manualImageModelToOption(model: ProviderModelInfo): ImageModelOption {
   return {
     modelId: model.modelId,
     displayName: model.nickname || model.modelId,
+    iconUrl: model.iconUrl,
   }
 }
 
@@ -36,6 +39,7 @@ function providerModelToOption(model: ProviderModelInfo): ImageModelOption {
   return {
     modelId: model.modelId,
     displayName: model.nickname || model.modelId,
+    iconUrl: model.iconUrl,
   }
 }
 

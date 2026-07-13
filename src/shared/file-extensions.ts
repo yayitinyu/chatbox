@@ -18,15 +18,28 @@ export const textExts = [
   '.htm', // HTML file (alternative extension)
   '.xml', // XML file
   '.json', // JSON file
+  '.jsonl', // JSON Lines file
+  '.ndjson', // Newline-delimited JSON file
   '.yaml', // YAML file
   '.yml', // YAML file (alternative extension)
   '.csv', // Comma-separated values file
   '.tsv', // Tab-separated values file
   '.ini', // Configuration file
+  '.cfg', // Configuration file
+  '.properties', // Java/properties configuration file
   '.log', // Log file
   '.rtf', // Rich text format file
   '.tex', // LaTeX file
   '.srt', // Subtitle file
+  '.vtt', // WebVTT subtitle file
+  '.ass', // Advanced SubStation Alpha subtitle file
+  '.ssa', // SubStation Alpha subtitle file
+  '.ics', // Calendar file
+  '.eml', // Email message source
+  '.svg', // Text-based vector image
+  '.diff', // Unified diff
+  '.patch', // Patch file
+  '.ipynb', // Jupyter notebook JSON
   '.xhtml', // XHTML file
   '.nfo', // Info file (mainly used for scene releases)
   '.conf', // Configuration file
@@ -40,7 +53,12 @@ export const textExts = [
   '.aspx', // ASP.NET file
   '.bat', // Windows batch file
   '.sh', // Unix/Linux shell script file
+  '.zsh', // Z shell script file
+  '.fish', // Fish shell script file
+  '.ps1', // PowerShell script file
   '.py', // Python script file
+  '.r', // R source file
+  '.rmd', // R Markdown file
   '.rb', // Ruby script file
   '.pl', // Perl script file
   '.sql', // SQL script file
@@ -78,11 +96,14 @@ export const textExts = [
   '.twig', // Twig template file
   '.blade', // Blade template file (Laravel)
   '.vue', // Vue.js single file component
+  '.svelte', // Svelte component
+  '.astro', // Astro component
   '.jsx', // React JSX file
   '.tsx', // React TSX file
   '.graphql', // GraphQL query language file
   '.gql', // GraphQL query language file
   '.proto', // Protocol Buffers file
+  '.prisma', // Prisma schema file
   '.thrift', // Thrift file
   '.toml', // TOML configuration file
   '.edn', // Clojure data representation file
@@ -103,10 +124,41 @@ export const textExts = [
   '.cc', // C++ source file (alternative extension)
   '.cxx', // C++ source file (alternative extension)
   '.mjs', // JavaScript ES module file
+  '.bib', // BibTeX bibliography
+  '.adoc', // AsciiDoc document
+  '.org', // Org mode document
+  '.mmd', // Mermaid/Markdown document
+  '.mermaid', // Mermaid diagram source
+  '.gitignore', // Git ignore rules
+  '.gitattributes', // Git attributes
+  '.editorconfig', // EditorConfig settings
+  '.npmrc', // npm settings
+  '.yarnrc', // Yarn settings
+]
+
+export const textFileNames = [
+  'readme',
+  'license',
+  'notice',
+  'changelog',
+  'authors',
+  'contributors',
+  'dockerfile',
+  'containerfile',
+  'makefile',
+  'procfile',
+  'gemfile',
+  'rakefile',
+  'vagrantfile',
+  'brewfile',
+  'justfile',
+  'taskfile',
 ]
 
 export function isTextFilePath(filePath: string) {
-  return textExts.some((ext) => filePath.toLowerCase().endsWith(ext))
+  const lowerPath = filePath.toLowerCase()
+  const fileName = lowerPath.split(/[\\/]/).pop() || ''
+  return textExts.some((ext) => lowerPath.endsWith(ext)) || textFileNames.includes(fileName)
 }
 
 export const sessionAttachmentRagExts = [
@@ -141,8 +193,8 @@ export function isEpubFilePath(filePath: string) {
   return epubExts.some((ext) => filePath.toLowerCase().endsWith(ext))
 }
 
-// All supported file extensions (merged office, text, epub)
-export const allSupportedExts = [...officeExts, ...textExts, ...epubExts]
+// All supported file extensions (merged office, legacy office, text, epub)
+export const allSupportedExts = [...officeExts, ...legacyOfficeExts, ...textExts, ...epubExts]
 
 // Unsupported file types (for user notification)
 // Includes: iWork files (except numbers), audio/video files, binary files, etc.
@@ -172,7 +224,7 @@ export function isSupportedFile(fileName: string): boolean {
   if (lowerName.endsWith('.numbers')) {
     return true
   }
-  return allSupportedExts.some((ext) => lowerName.endsWith(ext))
+  return isTextFilePath(lowerName) || allSupportedExts.some((ext) => lowerName.endsWith(ext))
 }
 
 /**
@@ -182,6 +234,10 @@ export function isSupportedFile(fileName: string): boolean {
  */
 export function getUnsupportedFileType(fileName: string): string | null {
   const lowerName = fileName.toLowerCase()
+
+  if (isSupportedFile(lowerName)) {
+    return null
+  }
 
   for (const [category, exts] of Object.entries(unsupportedPatterns)) {
     if (exts.some((ext) => lowerName.endsWith(ext))) {
@@ -210,17 +266,43 @@ export function getFileAcceptConfig(): Record<string, string[]> {
     // Image files
     'image/*': ['.jpg', '.jpeg', '.png'],
     // Text files
-    'text/plain': ['.txt', '.log', '.nfo', '.ini', '.conf', '.config', '.env'],
+    'text/plain': [
+      '.txt',
+      '.log',
+      '.nfo',
+      '.ini',
+      '.cfg',
+      '.conf',
+      '.config',
+      '.env',
+      '.properties',
+      '.srt',
+      '.vtt',
+      '.ass',
+      '.ssa',
+      '.diff',
+      '.patch',
+      '.gitignore',
+      '.gitattributes',
+      '.editorconfig',
+      '.npmrc',
+      '.yarnrc',
+    ],
     'text/markdown': ['.md', '.mdx'],
     'text/html': ['.html', '.htm', '.xhtml'],
     'text/xml': ['.xml'],
     'text/csv': ['.csv', '.tsv'],
     'text/css': ['.css', '.less', '.scss', '.sass', '.styl'],
     // Code files
-    'application/json': ['.json'],
+    'application/json': ['.json', '.jsonl', '.ndjson', '.ipynb'],
+    'image/svg+xml': ['.svg'],
+    'text/calendar': ['.ics'],
+    'message/rfc822': ['.eml'],
     'application/javascript': ['.js', '.jsx', '.mjs'],
     'application/typescript': ['.ts', '.tsx'],
     'text/x-python': ['.py'],
+    'text/x-r': ['.r', '.rmd'],
+    'text/x-powershell': ['.ps1'],
     'text/x-java': ['.java'],
     'text/x-c': ['.c', '.h'],
     'text/x-c++': ['.cpp', '.hpp', '.cc', '.cxx'],
@@ -237,6 +319,9 @@ export function getFileAcceptConfig(): Record<string, string[]> {
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     'application/vnd.openxmlformats-officedocument.presentationml.presentation': ['.pptx'],
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+    'application/msword': ['.doc'],
+    'application/vnd.ms-powerpoint': ['.ppt'],
+    'application/vnd.ms-excel': ['.xls'],
     'application/vnd.oasis.opendocument.text': ['.odt'],
     'application/vnd.oasis.opendocument.presentation': ['.odp'],
     'application/vnd.oasis.opendocument.spreadsheet': ['.ods'],
@@ -253,6 +338,8 @@ export function getFileAcceptConfig(): Record<string, string[]> {
       '.tex',
       '.srt',
       '.rst',
+      '.zsh',
+      '.fish',
       '.php',
       '.sh',
       '.bat',
@@ -282,9 +369,12 @@ export function getFileAcceptConfig(): Record<string, string[]> {
       '.twig',
       '.blade',
       '.vue',
+      '.svelte',
+      '.astro',
       '.graphql',
       '.gql',
       '.proto',
+      '.prisma',
       '.thrift',
       '.edn',
       '.cake',
@@ -296,6 +386,11 @@ export function getFileAcceptConfig(): Record<string, string[]> {
       '.gradle',
       '.jsp',
       '.aspx',
+      '.bib',
+      '.adoc',
+      '.org',
+      '.mmd',
+      '.mermaid',
     ],
   }
 }

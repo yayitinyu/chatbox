@@ -37,7 +37,7 @@ import { JK_EVENTS, JK_PAGE_NAMES } from '@/analytics/jk-events'
 import Divider from '@/components/common/Divider'
 import { ScalableIcon } from '@/components/common/ScalableIcon'
 import TokenCountMenu from '@/components/InputBox/TokenCountMenu'
-import ProviderImageIcon from '@/components/icons/ProviderImageIcon'
+import { ModelIcon } from '@/components/icons/ModelIcon'
 import WindowControls from '@/components/layout/WindowControls'
 import Markdown, { BlockCodeCollapsedStateProvider } from '@/components/Markdown'
 import ModelSelector from '@/components/ModelSelector'
@@ -669,7 +669,14 @@ function TaskChat({ session }: { session: NonNullable<ReturnType<typeof useTaskS
                   transitionProps={{ transition: 'fade-up', duration: 200 }}
                 >
                   <UnstyledButton className="flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-[var(--chatbox-background-tertiary)] transition-colors">
-                    {!!model && <ProviderImageIcon size={18} provider={model.provider} />}
+                    {!!model && (
+                      <ModelIcon
+                        size={18}
+                        modelId={model.modelId}
+                        providerId={model.provider}
+                        iconUrl={providerModelInfo?.iconUrl}
+                      />
+                    )}
                     <Text size="sm" className="text-[var(--chatbox-tint-secondary)] truncate max-w-[160px]">
                       {modelDisplayText}
                     </Text>

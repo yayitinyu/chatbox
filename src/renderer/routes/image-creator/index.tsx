@@ -13,21 +13,14 @@ import {
 } from '@mantine/core'
 import type { ImageGeneration, ImageGenerationModel } from '@shared/types'
 import { ModelProviderEnum } from '@shared/types'
-import {
-  IconArrowUp,
-  IconAspectRatio,
-  IconChevronRight,
-  IconHistory,
-  IconPhoto,
-  IconPlus,
-  IconSparkles,
-} from '@tabler/icons-react'
+import { IconArrowUp, IconAspectRatio, IconChevronRight, IconHistory, IconPhoto, IconPlus } from '@tabler/icons-react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { JK_PAGE_NAMES } from '@/analytics/jk-events'
 import { ChatboxWelcomeCard } from '@/components/common/ChatboxWelcomeCard'
 import { ImageModelSelect } from '@/components/ImageModelSelect'
+import { ModelIcon } from '@/components/icons/ModelIcon'
 import Page from '@/components/layout/Page'
 import { type ImageModelGroup, useImageModelGroups } from '@/hooks/useImageModelGroups'
 import { useProviders } from '@/hooks/useProviders'
@@ -80,6 +73,9 @@ interface InputToolbarProps {
   isSmallScreen: boolean
   modelGroups: ImageModelGroup[]
   modelDisplayName: string
+  selectedProvider: string
+  selectedModel: string
+  modelIconUrl?: string
   selectedRatio: string
   ratioOptions: string[]
   onModelDrawerOpen: () => void
@@ -95,6 +91,9 @@ function InputToolbar({
   isSmallScreen,
   modelGroups,
   modelDisplayName,
+  selectedProvider,
+  selectedModel,
+  modelIconUrl,
   selectedRatio,
   ratioOptions,
   onModelDrawerOpen,
@@ -108,17 +107,18 @@ function InputToolbar({
   const { t } = useTranslation()
 
   return (
-    <Flex align="center" gap={0} className="shrink-0 w-full" justify="space-between">
+    <Flex align="center" gap="xs" className="min-w-0 shrink-0 w-full">
       {/* Left Group: Model, Ratio, Reference */}
-      <Flex align="center" gap={0}>
+      <Flex align="center" gap={0} className="min-w-0 flex-1">
         {/* Model Select */}
         {isSmallScreen ? (
           <UnstyledButton
             onClick={onModelDrawerOpen}
-            className="flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-[var(--chatbox-background-tertiary)] transition-colors"
+            aria-label={t('Select Model')}
+            className="flex min-w-0 flex-1 items-center gap-1 px-2 py-1 rounded-lg hover:bg-[var(--chatbox-background-tertiary)] transition-colors"
           >
-            <IconSparkles size={16} className="text-[var(--chatbox-tint-secondary)]" />
-            <Text size="sm" className="text-[var(--chatbox-tint-secondary)] max-w-[120px] truncate">
+            <ModelIcon modelId={selectedModel || '?'} providerId={selectedProvider} iconUrl={modelIconUrl} size={17} />
+            <Text size="sm" className="min-w-0 flex-1 text-[var(--chatbox-tint-secondary)] truncate">
               {modelDisplayName}
             </Text>
             <IconChevronRight size={14} className="text-[var(--chatbox-tint-tertiary)] rotate-90" />
@@ -126,7 +126,12 @@ function InputToolbar({
         ) : (
           <ImageModelSelect modelGroups={modelGroups} onSelect={onModelSelect} onAddCustomModel={onAddCustomModel}>
             <UnstyledButton className="flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-[var(--chatbox-background-tertiary)] transition-colors">
-              <IconSparkles size={16} className="text-[var(--chatbox-tint-secondary)]" />
+              <ModelIcon
+                modelId={selectedModel || '?'}
+                providerId={selectedProvider}
+                iconUrl={modelIconUrl}
+                size={17}
+              />
               <Text size="sm" className="text-[var(--chatbox-tint-secondary)] max-w-[120px] truncate">
                 {modelDisplayName}
               </Text>
@@ -139,6 +144,7 @@ function InputToolbar({
         {isSmallScreen ? (
           <UnstyledButton
             onClick={onRatioDrawerOpen}
+            aria-label={`${t('Aspect Ratio')}: ${selectedRatio}`}
             className="flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-[var(--chatbox-background-tertiary)] transition-colors"
           >
             <IconAspectRatio size={16} className="text-[var(--chatbox-tint-secondary)]" />
@@ -171,22 +177,35 @@ function InputToolbar({
         )}
 
         {/* Reference Image Button */}
-        <UnstyledButton
-          onClick={onAddReference}
-          className="flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-[var(--chatbox-background-tertiary)] transition-colors"
-        >
-          <IconPhoto size={16} className="text-[var(--chatbox-tint-secondary)]" />
-          <Text size="sm" className="text-[var(--chatbox-tint-secondary)]">
-            {t('Upload')}
-          </Text>
-        </UnstyledButton>
+        {isSmallScreen ? (
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            size="md"
+            radius="lg"
+            onClick={onAddReference}
+            aria-label={t('Upload')}
+          >
+            <IconPhoto size={18} />
+          </ActionIcon>
+        ) : (
+          <UnstyledButton
+            onClick={onAddReference}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-[var(--chatbox-background-tertiary)] transition-colors"
+          >
+            <IconPhoto size={16} className="text-[var(--chatbox-tint-secondary)]" />
+            <Text size="sm" className="text-[var(--chatbox-tint-secondary)]">
+              {t('Upload')}
+            </Text>
+          </UnstyledButton>
+        )}
       </Flex>
 
       {/* Right Group: New Creation */}
       <Flex align="center" gap={4}>
         {/* New Creation Button */}
         {isSmallScreen ? (
-          <ActionIcon variant="light" size="md" radius="lg" onClick={onNewCreation}>
+          <ActionIcon variant="light" size="md" radius="lg" onClick={onNewCreation} aria-label={t('New Creation')}>
             <IconPlus size={18} />
           </ActionIcon>
         ) : (
@@ -491,6 +510,14 @@ function ImageCreatorPage() {
     })
   }, [selectedProvider, selectedModel, getImageModelDisplayName, t])
 
+  const selectedModelOption = useMemo(
+    () =>
+      imageModelGroups
+        .find((group) => group.providerId === selectedProvider)
+        ?.models.find((model) => model.modelId === selectedModel),
+    [imageModelGroups, selectedModel, selectedProvider]
+  )
+
   const getHistoryImageModelDisplayName = useCallback(
     (model: ImageGenerationModel) => {
       const legacyName = HISTORY_IMAGE_MODEL_DISPLAY_NAMES[model.modelId]
@@ -533,12 +560,12 @@ function ImageCreatorPage() {
 
   return (
     <Page title={t('Image Creator')} right={headerRight}>
-      <Flex flex={1} h="100%" className="overflow-hidden relative">
+      <Flex flex={1} h="100%" className="min-h-0 overflow-hidden relative">
         {/* Main Content Area */}
-        <Flex direction="column" flex={1} h="100%" className="overflow-hidden relative">
+        <Flex direction="column" flex={1} h="100%" className="min-h-0 overflow-hidden relative">
           {/* Results Area */}
-          <ScrollArea flex={1} type="auto" offsetScrollbars={!isSmallScreen}>
-            <Box maw={900} mx="auto" py="xl" px="md" className="min-h-full">
+          <ScrollArea flex={1} type="auto" offsetScrollbars={!isSmallScreen} className="min-h-0">
+            <Box maw={900} mx="auto" py={isSmallScreen ? 'sm' : 'xl'} px="md" className="min-h-full">
               {!currentRecord && <EmptyState onPromptSelect={handleQuickPromptSubmit} />}
 
               {currentRecord && (
@@ -583,7 +610,7 @@ function ImageCreatorPage() {
           </ScrollArea>
 
           {/* Input Area */}
-          <Box py="md" px="sm">
+          <Box py={isSmallScreen ? 'xs' : 'md'} px="sm" className="shrink-0">
             <Stack gap="sm" maw={800} mx="auto">
               {!currentRecord && welcomeCardMode !== 'none' && (
                 <ChatboxWelcomeCard mode={welcomeCardMode} pageName={JK_PAGE_NAMES.IMAGE_PAGE} />
@@ -605,7 +632,7 @@ function ImageCreatorPage() {
               />
 
               <Box
-                className="rounded-md bg-[var(--chatbox-background-secondary)] px-3 py-2"
+                className="rounded-xl bg-[var(--chatbox-background-secondary)] px-3 py-2"
                 style={{ border: '1px solid var(--chatbox-border-primary)' }}
               >
                 <Stack gap="xs">
@@ -665,6 +692,9 @@ function ImageCreatorPage() {
                     isSmallScreen={isSmallScreen}
                     modelGroups={imageModelGroups}
                     modelDisplayName={modelDisplayName}
+                    selectedProvider={selectedProvider}
+                    selectedModel={selectedModel}
+                    modelIconUrl={selectedModelOption?.iconUrl}
                     selectedRatio={selectedRatio}
                     ratioOptions={ratioOptions}
                     onModelDrawerOpen={() => setShowModelDrawer(true)}

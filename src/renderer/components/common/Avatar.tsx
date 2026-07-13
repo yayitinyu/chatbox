@@ -36,11 +36,16 @@ export const SystemAvatar: FC<SystemAvatarProps> = ({ size = 'md', className, ..
 export type UserAvatarProps = {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | number
   avatarKey?: string
+  picUrl?: string
 } & PolymorphicComponentProps<'div', AvatarProps>
 
-export const UserAvatar: FC<UserAvatarProps> = ({ size = 'md', avatarKey, className, ...avatarProps }) => {
+export const UserAvatar: FC<UserAvatarProps> = ({ size = 'md', avatarKey, picUrl, className, ...avatarProps }) => {
   const realSize = typeof size === 'number' ? size : { xs: 18, sm: 20, md: 28, lg: 32, xl: 36 }[size]
   const iconSize = Math.ceil(realSize / 2) + 2
+  const defaultAvatarKey = useSettingsStore((s) => s.userAvatarKey)
+  const defaultAvatarUrl = useSettingsStore((s) => s.userAvatarUrl)
+  const resolvedAvatarKey = avatarKey || defaultAvatarKey
+  const resolvedAvatarUrl = picUrl || (!resolvedAvatarKey ? defaultAvatarUrl : undefined)
 
   return (
     <Avatar
@@ -51,14 +56,15 @@ export const UserAvatar: FC<UserAvatarProps> = ({ size = 'md', avatarKey, classN
       classNames={{
         placeholder: 'border-0 bg-transparent !text-white flex flex-row items-center justify-center',
       }}
-      bg={avatarKey ? undefined : 'chatbox-tertiary'}
+      src={resolvedAvatarUrl}
+      bg={resolvedAvatarKey || resolvedAvatarUrl ? undefined : 'chatbox-tertiary'}
       {...avatarProps}
     >
-      {avatarKey ? (
-        <ImageInStorage storageKey={avatarKey} className="object-cover object-center w-full h-full" />
-      ) : (
+      {resolvedAvatarKey ? (
+        <ImageInStorage storageKey={resolvedAvatarKey} className="object-cover object-center w-full h-full" />
+      ) : !resolvedAvatarUrl ? (
         <ScalableIcon icon={IconUser} size={iconSize} className="!text-inherit" />
-      )}
+      ) : null}
     </Avatar>
   )
 }
@@ -71,7 +77,7 @@ export type AssistantAvatarProps = {
   sessionType?: 'chat' | 'picture' | 'guide'
 } & PolymorphicComponentProps<'div', AvatarProps>
 
-// 优先级: avatarKey > picUrl > defaultAssistantAvatarKey > sessionType
+// 优先级: avatarKey > picUrl > defaultAssistantAvatarKey > defaultAssistantAvatarUrl > sessionType
 export const AssistantAvatar: FC<AssistantAvatarProps> = ({
   size = 'md',
   type = 'assistant',
@@ -84,6 +90,8 @@ export const AssistantAvatar: FC<AssistantAvatarProps> = ({
   const realSize = typeof size === 'number' ? size : { xs: 18, sm: 20, md: 28, lg: 32, xl: 36 }[size]
   const iconSize = Math.ceil(realSize / 2) + 2
   const defaultAssistantAvatarKey = useSettingsStore((s) => s.defaultAssistantAvatarKey)
+  const defaultAssistantAvatarUrl = useSettingsStore((s) => s.defaultAssistantAvatarUrl)
+  const resolvedAvatarUrl = picUrl || (!defaultAssistantAvatarKey ? defaultAssistantAvatarUrl : undefined)
   return (
     <Avatar
       size={realSize}
@@ -93,9 +101,9 @@ export const AssistantAvatar: FC<AssistantAvatarProps> = ({
       classNames={{
         placeholder: 'border-0 bg-transparent flex flex-row items-center justify-center text-inherit',
       }}
-      src={!avatarKey ? picUrl : undefined}
+      src={!avatarKey ? resolvedAvatarUrl : undefined}
       bg={
-        avatarKey || picUrl || defaultAssistantAvatarKey
+        avatarKey || resolvedAvatarUrl || defaultAssistantAvatarKey
           ? undefined
           : type === 'chat'
             ? undefined
@@ -108,7 +116,7 @@ export const AssistantAvatar: FC<AssistantAvatarProps> = ({
     >
       {avatarKey ? (
         <ImageInStorage storageKey={avatarKey} className="object-cover object-center w-full h-full" />
-      ) : !picUrl ? (
+      ) : !resolvedAvatarUrl ? (
         defaultAssistantAvatarKey ? (
           <ImageInStorage storageKey={defaultAssistantAvatarKey} className="object-cover object-center w-full h-full" />
         ) : sessionType === 'picture' ? (
